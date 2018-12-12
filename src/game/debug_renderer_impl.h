@@ -10,6 +10,17 @@ namespace jc
 class DebugRendererImpl
 {
   public:
+    void DebugRectGradient(const CVector2f &topleft, const CVector2f &bottomright, uint32_t leftcolor,
+                           uint32_t rightcolor)
+    {
+        CVector2f p1{topleft.x, bottomright.y};
+        CVector2f p0{bottomright.x, topleft.y};
+
+        DebugTriangleFilled(topleft, p1, p0, leftcolor, leftcolor, rightcolor);
+        DebugTriangleFilled(p0, p1, bottomright, rightcolor, leftcolor, rightcolor);
+    }
+
+  public:
     virtual ~DebugRendererImpl()                                                                               = 0;
     virtual void DebugLine3d()                                                                                 = 0;
     virtual void DebugLine(const CVector2f &from, const CVector2f &to, uint32_t from_color, uint32_t to_color) = 0;

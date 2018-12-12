@@ -2,8 +2,8 @@
 
 namespace
 {
-using XInputGetState_t = DWORD(*)(DWORD, uintptr_t);
-using XInputSetState_t = DWORD(*)(DWORD, uintptr_t);
+using XInputGetState_t = DWORD (*)(DWORD, uintptr_t);
+using XInputSetState_t = DWORD (*)(DWORD, uintptr_t);
 
 static XInputGetState_t XInputGetState_;
 static XInputSetState_t XInputSetState_;
