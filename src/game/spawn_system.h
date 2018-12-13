@@ -27,6 +27,8 @@ class CSpawnSystem
             void*                                              userdata;
         };
 
+        // TODO(aaronlad): handle bad requests or we will leak memory
+
         auto request = new SpawnReq{callback, userdata};
         hk::func_call<void>(
             0x140A3B430, this, model_name.c_str(), transform, 0x597Cu,

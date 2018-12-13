@@ -56,15 +56,14 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         Input::Get()->RegisterCommand(std::make_unique<EventCommand>());
         Input::Get()->RegisterCommand(std::make_unique<SpawnCommand>());
 #ifdef DEBUG
-        Input::Get()->RegisterCommand("exit", [](const std::string &arguments) {
-            TerminateProcess(GetCurrentProcess(), -1);
-        });
+        Input::Get()->RegisterCommand("exit",
+                                      [](const std::string &arguments) { TerminateProcess(GetCurrentProcess(), -1); });
 #endif
 
         static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF6470);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
             auto game_state = *(uint32_t *)0x142A5F9C4;
-            if (/*game_state == 3 && */Input::Get()->WndProc(uMsg, wParam, lParam)) {
+            if (game_state == 3 && Input::Get()->WndProc(uMsg, wParam, lParam)) {
                 return 0;
             }
 

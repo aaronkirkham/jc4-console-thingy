@@ -20,7 +20,7 @@ class EventCommand : public ICommand
         return true;
     }
 
-	virtual std::vector<std::string> GetHints(const std::string& arguments) override
+    virtual std::vector<std::string> GetHints(const std::string& arguments) override
     {
         return {};
     }

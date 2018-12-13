@@ -18,15 +18,17 @@ class Input : public Singleton<Input>
   private:
     bool                     m_drawInput = false;
     std::vector<std::string> m_history;
-    int32_t                  m_currentHistory;
-    ICommand*                m_cmd          = nullptr;
-    std::string              m_cmdText      = "";
-    std::string              m_cmdArguments = "";
+    int32_t                  m_currentHistory = 0;
+    ICommand*                m_cmd            = nullptr;
+    std::string              m_cmdText        = "";
+    std::string              m_cmdArguments   = "";
+    std::vector<std::string> m_hints;
+    int32_t                  m_currentHint = -1;
 
     std::unordered_map<std::string, std::unique_ptr<ICommand>> m_commands;
     std::unordered_map<std::string, command_t>                 m_fnCommands;
 
-    bool UpdateCurrentCommand();
+    bool UpdateCurrentCommand(bool update_hints = true);
     void AddToHistory(const std::string& command);
 
   public:
