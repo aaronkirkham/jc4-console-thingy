@@ -35,40 +35,37 @@ void Input::Draw()
     auto device         = jc::NGraphicsEngine::CGraphicsEngine::instance().m_device;
     auto debug_renderer = jc::CRenderEngine::instance().m_debugRenderer;
 
+    static const float _hintItemHeight = 0.02f;
+    static const float _fontSizeInput  = 0.0155f;
+    static const float _fontSizeHint   = 0.0133f;
+
     if (m_drawInput && (device && debug_renderer)) {
         // draw hints
         if (m_cmd && m_hints.size() > 0) {
-            const auto count = std::clamp<uint32_t>(m_hints.size(), 0, 10);
+            const auto  count        = std::clamp<uint32_t>(m_hints.size(), 0, 10);
+            const float total_height = (_hintItemHeight * count);
 
-            static constexpr float item_height = 18.0f;
+            debug_renderer->DebugRectGradient({0, (0.94f - total_height - 0.02f)}, {0.5f, 0.94f}, 0xB4000000,
+                                              0x00000000);
 
-            // draw background box
-            float text_height = ((item_height * count) / device->m_screenHeight);
-            debug_renderer->DebugRectGradient({0, (0.94f - text_height)}, {0.5f, 0.94f}, 0xB4000000, 0x00000000);
-
-            // draw hints
             for (uint32_t i = 0; i < count; ++i) {
-                float text_y = ((0.94f * device->m_screenHeight) - (item_height * count)) + (item_height * i);
+                // draw current hint
+                const float y = (0.9325f - total_height + (_hintItemHeight * i));
+                Graphics::Get()->DrawString(m_hints[i], 0.0195f, y, _fontSizeHint, 0xFFFFFFFF);
 
-                if (m_currentHint == i) {
-                    Graphics::Get()->DrawString("> ", {(0.0078f * device->m_screenWidth), text_y}, 12, 0xFFFFFFFF);
+                if (i == m_currentHint) {
+                    Graphics::Get()->DrawString("> ", 0.0078f, y, _fontSizeHint, 0xFFFFFFFF);
                 }
-
-                Graphics::Get()->DrawString(m_hints[i], {(0.0195f * device->m_screenWidth), text_y}, 12, 0xFFFFFFFF);
             }
         }
 
-        // draw background box
+        // draw current input text
         debug_renderer->DebugRectGradient({0, 0.95f}, {0.5f, 1}, 0xE1000000, 0x00000000);
+        Graphics::Get()->DrawString(m_history[0], 0.0195f, 0.965f, _fontSizeInput, 0xFFFFFFFF);
 
         if (m_currentHint == -1) {
-            Graphics::Get()->DrawString("> ", {(0.0078f * device->m_screenWidth), (0.965f * device->m_screenHeight)},
-                                        14, 0xFFFFFFFF);
+            Graphics::Get()->DrawString("> ", 0.0078f, 0.965f, _fontSizeInput, 0xFFFFFFFF);
         }
-
-        // render input text
-        Graphics::Get()->DrawString(
-            m_history[0], {(0.0195f * device->m_screenWidth), (0.965f * device->m_screenHeight)}, 14, 0xFFFFFFFF);
     }
 }
 

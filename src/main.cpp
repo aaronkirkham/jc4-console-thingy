@@ -82,8 +82,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         static hk::inject_jump<void, jc::HDevice_t *> flip(0x140DF4E90);
         flip.inject([](jc::HDevice_t *device) -> void {
-            Graphics::Get()->Init(device);
+            Graphics::Get()->BeginDraw(device);
+
+            // draw input
             Input::Get()->Draw();
+
+            Graphics::Get()->EndDraw();
 
             flip.call(device);
         });

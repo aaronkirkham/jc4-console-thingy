@@ -1,5 +1,8 @@
 #pragma once
 
+#include <d3d11.h>
+
+#include <CFW1StateSaver.h>
 #include <FW1FontWrapper.h>
 #include <codecvt>
 
@@ -10,15 +13,17 @@
 class Graphics : public Singleton<Graphics>
 {
   private:
-    bool             m_ready  = false;
-    jc::HDevice_t*   m_device = nullptr;
-    IFW1FontWrapper* m_font   = nullptr;
+    bool                           m_ready  = false;
+    jc::HDevice_t*                 m_device = nullptr;
+    IFW1FontWrapper*               m_font   = nullptr;
+    FW1FontWrapper::CFW1StateSaver m_prevState{};
+    bool                           m_restoreState = false;
 
   public:
     Graphics()  = default;
     ~Graphics() = default;
 
-    void Init(jc::HDevice_t* device)
+    void BeginDraw(jc::HDevice_t* device)
     {
         if (!m_ready && device) {
             IFW1Factory* factory = nullptr;
@@ -51,16 +56,31 @@ class Graphics : public Singleton<Graphics>
                 factory->Release();
             }
         }
+
+        // save the current state
+        if (m_device) {
+            m_restoreState = SUCCEEDED(m_prevState.saveCurrentState(m_device->m_deviceContext));
+        }
     }
 
-    void DrawString(const std::string& str, const CVector2f& position, float size, uint32_t color)
+    void EndDraw()
     {
-        if (!m_ready) {
+        if (m_restoreState) {
+            m_prevState.restoreSavedState();
+        }
+    }
+
+    void DrawString(const std::string& str, float x, float y, float size, uint32_t color)
+    {
+        if (!m_ready || !m_device) {
             return;
         }
 
+        x    = (x * m_device->m_screenWidth);
+        y    = (y * m_device->m_screenHeight);
+        size = (size * m_device->m_screenHeight);
+
         std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
-        m_font->DrawString(m_device->m_deviceContext, converter.from_bytes(str).c_str(), size, position.x, position.y,
-                           color, FW1_RESTORESTATE);
+        m_font->DrawString(m_device->m_deviceContext, converter.from_bytes(str).c_str(), size, x, y, color, 0);
     }
 };

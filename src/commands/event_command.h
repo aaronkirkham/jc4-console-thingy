@@ -5,6 +5,14 @@
 class EventCommand : public ICommand
 {
   public:
+    // clang-format off
+    std::array<const char*, 3> m_Hints = {
+        "ply.unlimitedammo.enable",
+        "ply.unlimitedammo.disable",
+        "ply.ammo.givemax",
+    };
+    // clang-format on
+
     virtual const char* GetCommand() override
     {
         return "event";
