@@ -20,24 +20,31 @@ class CSpawnSystem
     void Spawn(const std::string& model_name, const CMatrix4f& transform,
                std::function<void(const spawned_objects&, void*)> callback, void* userdata = nullptr)
     {
-        using callback_t = void(__cdecl*)(const spawned_objects&, void*);
+        using success_t = void(__cdecl*)(const spawned_objects&, void*);
+        using status_t  = void(__cdecl*)(int32_t, void*);
 
         struct SpawnReq {
             std::function<void(const spawned_objects&, void*)> callback;
             void*                                              userdata;
         };
 
-        // TODO(aaronlad): handle bad requests or we will leak memory
-
         auto request = new SpawnReq{callback, userdata};
         hk::func_call<void>(
             0x140A3B430, this, model_name.c_str(), transform, 0x597Cu,
-            (callback_t)[](const spawned_objects& objects, void* userdata) {
+            (success_t)[](const spawned_objects& objects, void* userdata) {
                 auto spawn_req = (SpawnReq*)userdata;
                 spawn_req->callback(objects, spawn_req->userdata);
                 delete spawn_req;
             },
-            request, nullptr, 0, -1);
+            request,
+            (status_t)[](int32_t status, void* userdata) {
+                // resource failed to load
+                if (status == 16) {
+                    auto spawn_req = (SpawnReq*)userdata;
+                    delete spawn_req;
+                }
+            },
+            0, -1);
     }
 };
 } // namespace jc

@@ -16,6 +16,10 @@ class EventCommand : public ICommand
         // ply.unlimitedammo.disable
         // ply.ammo.givemax
 
+        if (arguments == "load_game" || arguments == "new_game" || arguments == "continue_game") {
+            return false;
+        }
+
         hk::func_call<void>(0x147F69F60, arguments.c_str(), nullptr);
         return true;
     }
