@@ -20,10 +20,6 @@ class EventCommand : public ICommand
 
     virtual bool Handler(const std::string& arguments) override
     {
-        // ply.unlimitedammo.enable
-        // ply.unlimitedammo.disable
-        // ply.ammo.givemax
-
         if (arguments == "load_game" || arguments == "new_game" || arguments == "continue_game") {
             return false;
         }
@@ -34,6 +30,11 @@ class EventCommand : public ICommand
 
     virtual std::vector<std::string> GetHints(const std::string& arguments) override
     {
-        return {};
+        std::vector<std::string> result;
+        std::copy_if(m_Hints.begin(), m_Hints.end(), std::back_inserter(result), [&](const std::string& item) {
+            return (result.size() < 10) ? (item.find(arguments) != std::string::npos) : false;
+        });
+
+        return result;
     }
 };

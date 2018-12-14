@@ -16,7 +16,7 @@ class Graphics : public Singleton<Graphics>
     bool                           m_ready  = false;
     jc::HDevice_t*                 m_device = nullptr;
     IFW1FontWrapper*               m_font   = nullptr;
-    FW1FontWrapper::CFW1StateSaver m_prevState{};
+    FW1FontWrapper::CFW1StateSaver m_state{};
     bool                           m_restoreState = false;
 
   public:
@@ -59,14 +59,14 @@ class Graphics : public Singleton<Graphics>
 
         // save the current state
         if (m_device) {
-            m_restoreState = SUCCEEDED(m_prevState.saveCurrentState(m_device->m_deviceContext));
+            m_restoreState = SUCCEEDED(m_state.saveCurrentState(m_device->m_deviceContext));
         }
     }
 
     void EndDraw()
     {
         if (m_restoreState) {
-            m_prevState.restoreSavedState();
+            m_state.restoreSavedState();
         }
     }
 
@@ -79,6 +79,16 @@ class Graphics : public Singleton<Graphics>
         x    = (x * m_device->m_screenWidth);
         y    = (y * m_device->m_screenHeight);
         size = (size * m_device->m_screenHeight);
+
+        std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
+        m_font->DrawString(m_device->m_deviceContext, converter.from_bytes(str).c_str(), size, x, y, color, 0);
+    }
+
+    void DrawStringPX(const std::string& str, float x, float y, float size, uint32_t color)
+    {
+        if (!m_ready || !m_device) {
+            return;
+        }
 
         std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
         m_font->DrawString(m_device->m_deviceContext, converter.from_bytes(str).c_str(), size, x, y, color, 0);

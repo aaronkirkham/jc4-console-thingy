@@ -7,6 +7,7 @@
 #include "input.h"
 #include "util.h"
 
+#include "game/clock.h"
 #include "game/debug_renderer_impl.h"
 #include "game/device.h"
 #include "game/game_object.h"
@@ -61,7 +62,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         // enable quick start
         if (quick_start) {
             // quick start
-            *(bool *)0x142A5F9EC = true;
+            hk::put<bool>(0x142A5F9EC, true);
 
             // IsIntroSequenceComplete always returns true
             hk::put<uint32_t>(0x140CBAB00, 0x90C301B0);
@@ -73,8 +74,16 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF6470);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
             auto game_state = *(uint32_t *)0x142A5F9C4;
-            if (game_state == 3 && Input::Get()->WndProc(uMsg, wParam, lParam)) {
-                return 0;
+            if (game_state == 3) {
+                if (!jc::Base::CClock::instance().m_paused) {
+                    if (Input::Get()->WndProc(uMsg, wParam, lParam)) {
+                        return 0;
+                    }
+                }
+                // disable input if the clock is paused and input is still enabled somehow
+                else if (Input::Get()->IsInputEnabled()) {
+                    Input::Get()->EnableInput(false);
+                }
             }
 
             return wndproc.call(hwnd, uMsg, wParam, lParam);
