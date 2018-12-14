@@ -8,6 +8,7 @@
 
 #include "game/graphics_engine.h"
 #include "game/render_engine.h"
+#include "game/ui_manager.h"
 
 void Input::EnableInput(bool toggle)
 {
@@ -20,6 +21,11 @@ void Input::EnableInput(bool toggle)
     m_drawInput      = toggle;
     m_currentHistory = 0;
     m_currentHint    = -1;
+
+    // toggle hud which might get in the way (bottomleft)
+    auto &ui_manager                            = jc::CUIManager::instance();
+    ui_manager.m_unknown->m_bottomLeft->m_state = toggle ? 1 : 2;
+    ui_manager.m_unknown->m_vehicle->m_state    = toggle ? 1 : 2;
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
