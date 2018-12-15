@@ -279,7 +279,8 @@ bool Input::UpdateCurrentCommand(bool update_hints)
             m_cmdText      = input_text.substr(0, idx);
             m_cmdArguments = input_text.substr(idx + 1, input_text.length());
         } else {
-            m_cmdText = input_text;
+            m_cmdText      = input_text;
+            m_cmdArguments = "";
         }
 
         auto it = m_commands.find(m_cmdText);
@@ -303,7 +304,7 @@ void Input::AddToHistory(const std::string &command)
         // clear after 100 entries
         if (m_history.size() > 100) {
             m_history.clear();
-            m_history[0] = "";
+            m_history.push_back("");
         }
 
         m_history.push_back(command);
