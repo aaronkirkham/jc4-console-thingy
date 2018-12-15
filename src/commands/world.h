@@ -45,9 +45,8 @@ class WorldCommand : public ICommand
     virtual std::vector<std::string> GetHints(const std::string& arguments) override
     {
         std::vector<std::string> result;
-        std::copy_if(m_Hints.begin(), m_Hints.end(), std::back_inserter(result), [&](const std::string& item) {
-            return (result.size() < 10) ? (item.find(arguments) != std::string::npos) : false;
-        });
+        std::copy_if(m_Hints.begin(), m_Hints.end(), std::back_inserter(result),
+                     [&](const std::string& item) { return item.find(arguments) != std::string::npos; });
 
         return result;
     }

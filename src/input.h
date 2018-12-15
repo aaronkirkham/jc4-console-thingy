@@ -23,7 +23,8 @@ class Input : public Singleton<Input>
     std::string              m_cmdText        = "";
     std::string              m_cmdArguments   = "";
     std::vector<std::string> m_hints;
-    int32_t                  m_currentHint = -1;
+    int32_t                  m_selectedHint = -1;
+    int32_t                  m_hintPage     = 0;
 
     std::unordered_map<std::string, std::unique_ptr<ICommand>> m_commands;
     std::unordered_map<std::string, command_t>                 m_fnCommands;

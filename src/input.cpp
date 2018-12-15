@@ -10,6 +10,8 @@
 #include "game/render_engine.h"
 #include "game/ui_manager.h"
 
+static const int32_t _numHintsPerPage = 10;
+
 void Input::EnableInput(bool toggle)
 {
     static void *input_thingy = nullptr;
@@ -20,7 +22,8 @@ void Input::EnableInput(bool toggle)
 
     m_drawInput      = toggle;
     m_currentHistory = 0;
-    m_currentHint    = -1;
+    m_selectedHint   = -1;
+    m_hintPage       = 0;
 
     // toggle hud which might get in the way (bottomleft)
     auto &ui_manager                            = jc::CUIManager::instance();
@@ -48,7 +51,7 @@ void Input::Draw()
     if (m_drawInput && (device && debug_renderer)) {
         // draw hints
         if (m_cmd && m_hints.size() > 0) {
-            const auto  count        = std::clamp<uint32_t>(m_hints.size(), 0, 10);
+            const auto  count        = std::clamp<uint32_t>((m_hints.size() - m_hintPage), 0, _numHintsPerPage);
             const float total_height = (_hintItemHeight * count);
 
             debug_renderer->DebugRectGradient({0, (0.94f - total_height - 0.02f)}, {0.5f, 0.94f}, 0xB4000000,
@@ -57,9 +60,9 @@ void Input::Draw()
             for (uint32_t i = 0; i < count; ++i) {
                 // draw current hint
                 const float y = (0.9325f - total_height + (_hintItemHeight * i));
-                Graphics::Get()->DrawString(m_hints[i], 0.0195f, y, _fontSizeHint, 0xFFFFFFFF);
+                Graphics::Get()->DrawString(m_hints[i + m_hintPage], 0.0195f, y, _fontSizeHint, 0xFFFFFFFF);
 
-                if (i == m_currentHint) {
+                if ((i + m_hintPage) == m_selectedHint) {
                     Graphics::Get()->DrawString("> ", 0.0078f, y, _fontSizeHint, 0xFFFFFFFF);
                 }
             }
@@ -69,7 +72,7 @@ void Input::Draw()
         debug_renderer->DebugRectGradient({0, 0.95f}, {0.5f, 1}, 0xE1000000, 0x00000000);
         Graphics::Get()->DrawString(m_history[0], 0.0195f, 0.965f, _fontSizeInput, 0xFFFFFFFF);
 
-        if (m_currentHint == -1) {
+        if (m_selectedHint == -1) {
             Graphics::Get()->DrawString("> ", 0.0078f, 0.965f, _fontSizeInput, 0xFFFFFFFF);
         }
     }
@@ -86,11 +89,13 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                 return true;
             }
 
+            // TODO(aaronlad): clean some of this up..
+
             // handle history navigation
             if (m_drawInput) {
                 switch (wParam) {
                     case VK_ESCAPE: {
-                        if (m_currentHint == -1) {
+                        if (m_selectedHint == -1) {
                             if (m_history[0].size() > 0) {
                                 m_history[0].clear();
                                 m_cmdText        = "";
@@ -101,7 +106,8 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                                 EnableInput(false);
                             }
                         } else {
-                            m_currentHint = -1;
+                            m_selectedHint = -1;
+                            m_hintPage     = 0;
                         }
 
                         return true;
@@ -109,7 +115,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
 
                     case VK_UP: {
                         // previous history item
-                        if (m_currentHint == -1) {
+                        if (m_selectedHint == -1) {
                             if (m_currentHistory == 0) {
                                 m_currentHistory = (m_history.size() - 1);
                             } else if (m_currentHistory > 1) {
@@ -122,7 +128,11 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
                         // previous hint item
                         else {
-                            m_currentHint = std::max(--m_currentHint, 0);
+                            if ((m_selectedHint % _numHintsPerPage) == 0) {
+                                m_hintPage = std::max((m_hintPage - _numHintsPerPage), 0);
+                            }
+
+                            m_selectedHint = std::max(--m_selectedHint, 0);
                         }
 
                         return true;
@@ -130,7 +140,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
 
                     case VK_DOWN: {
                         // next history item
-                        if (m_currentHint == -1) {
+                        if (m_selectedHint == -1) {
                             if (m_currentHistory > 0 && m_currentHistory < (m_history.size() - 1)) {
                                 ++m_currentHistory;
                                 m_history[0] = m_history[m_currentHistory];
@@ -144,7 +154,14 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
                         // next hint item
                         else {
-                            m_currentHint = std::min(++m_currentHint, static_cast<int32_t>(m_hints.size() - 1));
+                            const auto size = m_hints.size();
+                            if (m_selectedHint != (size - 1)) {
+                                ++m_selectedHint;
+
+                                if (size > _numHintsPerPage && (m_selectedHint % _numHintsPerPage) == 0) {
+                                    m_hintPage += _numHintsPerPage;
+                                }
+                            }
                         }
 
                         return true;
@@ -152,8 +169,9 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
 
                     // move focus into the hints list
                     case VK_TAB: {
-                        if (m_currentHint == -1 && m_hints.size() > 0) {
-                            m_currentHint = 0;
+                        if (m_selectedHint == -1 && m_hints.size() > 0) {
+                            m_selectedHint = 0;
+                            m_hintPage     = 0;
                         }
 
                         return true;
@@ -173,13 +191,19 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
 
+                // ignore input if the control key is down
+                if (GetAsyncKeyState(VK_CONTROL)) {
+                    break;
+                }
+
                 switch (wParam) {
                     case VK_RETURN: {
                         // use the current hint as the command argument
-                        if (m_currentHint != -1) {
-                            m_cmdArguments = m_hints[m_currentHint];
+                        if (m_selectedHint != -1) {
+                            m_cmdArguments = m_hints[m_selectedHint];
                             m_history[0]   = (m_cmdText + " " + m_cmdArguments);
-                            m_currentHint  = -1;
+                            m_selectedHint = -1;
+                            m_hintPage     = 0;
                             m_hints.clear();
                             break;
                         }
@@ -208,7 +232,8 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                     }
 
                     case VK_BACK: {
-                        m_currentHint = -1;
+                        m_selectedHint = -1;
+                        m_hintPage     = 0;
 
                         if (m_history[0].size() > 0) {
                             m_history[0].pop_back();
@@ -224,7 +249,8 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                     }
 
                     default: {
-                        m_currentHint = -1;
+                        m_selectedHint = -1;
+                        m_hintPage     = 0;
                         m_history[0].push_back((unsigned short)wParam);
                         UpdateCurrentCommand();
                         break;

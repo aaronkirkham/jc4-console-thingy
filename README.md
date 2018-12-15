@@ -15,13 +15,14 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
  - `world` - Change world parameters
 
 ### Controls
- - `Tilde` (\`~) - Toggle the input
+ - `Tilde` (\`~) - Toggle the input box
  - `Escape` - Clear current input text
  - `Up/Down Arrows` - Navigate the input history
  - `TAB` - Change focus to the hints list
  - **When hints list is focused**
    - `Escape` - Return focus to main input
    - `Up/Down Arrows` - Navigate the list
+   - `Enter` - Append the current hint to the input text
 
 #### Building
 If you want to compile the code yourself, you will need **Visual Studio 2017 or later** (or a compiler which supports C++17 nested namespaces)
