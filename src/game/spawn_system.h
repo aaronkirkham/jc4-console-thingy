@@ -14,7 +14,7 @@ class CSpawnSystem
   public:
     static CSpawnSystem& instance()
     {
-        return **(CSpawnSystem**)0x142A58BF0;
+        return **(CSpawnSystem**)0x142A5D0F0;
     }
 
     void Spawn(const std::string& model_name, const CMatrix4f& transform,
@@ -30,7 +30,7 @@ class CSpawnSystem
 
         auto request = new SpawnReq{callback, userdata};
         hk::func_call<void>(
-            0x140A3B430, this, model_name.c_str(), transform, 0x597Cu,
+            0x140A3A490, this, model_name.c_str(), transform, 0x597Cu,
             (success_t)[](const spawned_objects& objects, void* userdata) {
                 auto spawn_req = (SpawnReq*)userdata;
                 spawn_req->callback(objects, spawn_req->userdata);

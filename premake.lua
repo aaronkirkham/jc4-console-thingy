@@ -8,8 +8,8 @@ workspace "jc4-console-thing"
   cppdialect "c++17"
   characterset "MBCS"
   architecture "x64"
-  disablewarnings { "26451", "26491", "26495", "28020" }
-  defines { "WIN32", "WIN32_LEAN_AND_MEAN", "_CRT_SECURE_NO_WARNINGS", "_CRT_NONSTDC_NO_DEPRECATE" }
+  disablewarnings { "4005", "26451", "26491", "26495", "28020" }
+  defines { "WIN32", "WIN32_LEAN_AND_MEAN", "NOMINMAX", "_CRT_SECURE_NO_WARNINGS", "_CRT_NONSTDC_NO_DEPRECATE" }
 
   filter "configurations:Debug"
     defines { "DEBUG", "_DEBUG", "_ITERATOR_DEBUG_LEVEL=0" }

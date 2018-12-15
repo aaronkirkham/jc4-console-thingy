@@ -10,7 +10,7 @@ class CRenderEngine
   public:
     static CRenderEngine& instance()
     {
-        return **(CRenderEngine**)0x142A1BCA8;
+        return **(CRenderEngine**)0x142A201A8;
     }
 
   public:

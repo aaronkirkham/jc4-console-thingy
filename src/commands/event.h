@@ -6,10 +6,17 @@ class EventCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char*, 3> m_Hints = {
+    std::array<const char*, 10> m_Hints = {
+        "__showfps",
+        "__reload_world",
         "ply.unlimitedammo.enable",
         "ply.unlimitedammo.disable",
         "ply.ammo.givemax",
+        "ply.pause",
+        "ply.unpause",
+        "ply.vehicle.burn",
+        "moon_gravity_on",
+        "moon_gravity_off",
     };
     // clang-format on
 
@@ -24,7 +31,7 @@ class EventCommand : public ICommand
             return false;
         }
 
-        hk::func_call<void>(0x147F69F60, arguments.c_str(), nullptr);
+        hk::func_call<void>(0x1447428C0, arguments.c_str(), nullptr);
         return true;
     }
 

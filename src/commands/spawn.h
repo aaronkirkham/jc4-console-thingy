@@ -6,7 +6,8 @@ class SpawnCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char *, 220> m_Hints = {
+    std::array<const char *, 259> m_Hints = {
+        // VEHICLES
         "v000_car_atv_civilian_01",
         "v000_car_atv_javi",
         "v001_car_forklift_industrial",
@@ -40,7 +41,7 @@ class SpawnCommand : public ICommand
         "v017_car_vintagemuscle_bomb_special",
         "v017_car_vintagemuscle_civilian",
         "v017_car_vintagemuscle_civilian_02",
-		"v017_car_vintagemuscle_rico",
+        "v017_car_vintagemuscle_rico",
         "v018_car_monstertruck_bomb_special",
         "v018_car_monstertruck_civilian_01",
         "v019_car_modernlimo_bomb_special",
@@ -254,6 +255,47 @@ class SpawnCommand : public ICommand
         // "v905_trailer_",
         // "v906_trailer_",
         "v907_trailer_radarjammer_military",
+
+        // WEAPONS
+        "wpn_000_assault_rifle",
+        "wpn_001_assault_rifle",
+        "wpn_003_assault_rifle",
+        "wpn_010_machine_gun",
+        "wpn_011_machine_gun",
+        "wpn_020_shotgun",
+        "wpn_021_shotgun",
+        "wpn_022_shotgun",
+        "wpn_030_sniper_rifle",
+        "wpn_031_sniper_rifle",
+        "wpn_032_sniper_rifle",
+        "wpn_040_combat_rifle",
+        "wpn_050_smg",
+        "wpn_060_rpg",
+        "wpn_061_rpg",
+        "wpn_063_rpg",
+        "wpn_070_glauncher",
+        "wpn_071_mlauncher",
+        "wpn_080_experimental",
+        "wpn_081_experimental",
+        "wpn_100_railgun",
+        "wpn_102_crossbow",
+        "w206_mounted_capstone_m2hm",
+        "wpn_201_minigun",
+        "wpn_201_minigun_mount",
+        "wpn_201_minigun_mount_rebel",
+        "wpn_201_minigun_mount_military",
+        "w301_grenade",
+        "w303_concussion_grenade",
+        "w304_death_dropped_grenade",
+        "wpn_202_cannon",
+        "wpn_202_cannon_rebel",
+        "wpn_203_aa_gun",
+        "wpn_203_aa_gun_rebel",
+        "wpn_204_mortar_mounted",
+        "wpn_204_mortar_mounted_rebel",
+        "illapa_defence_weapon",
+        "wpn_800_combat_rifle_cow_gun",
+        "wpn_990_premium_wingsuit_bullet_streamer",
     };
     // clang-format on
 

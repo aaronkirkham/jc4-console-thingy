@@ -14,8 +14,9 @@
 #include "game/player_manager.h"
 #include "game/spawn_system.h"
 
-#include "commands/event_command.h"
-#include "commands/spawn_command.h"
+#include "commands/event.h"
+#include "commands/spawn.h"
+#include "commands/world.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -36,7 +37,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         }
 
         // if we are running on the wrong version, don't continue
-        if (*(uint32_t *)0x141C78F48 != 0x6c617641) {
+        if (*(uint32_t *)0x141C7BD20 != 0x6c617641) {
 #ifdef DEBUG
             MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
 #endif
@@ -48,6 +49,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         Input::Get()->RegisterCommand(std::make_unique<EventCommand>());
         Input::Get()->RegisterCommand(std::make_unique<SpawnCommand>());
+        Input::Get()->RegisterCommand(std::make_unique<WorldCommand>());
 #ifdef DEBUG
         Input::Get()->RegisterCommand("exit",
                                       [](const std::string &arguments) { TerminateProcess(GetCurrentProcess(), -1); });
@@ -62,18 +64,18 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         // enable quick start
         if (quick_start) {
             // quick start
-            hk::put<bool>(0x142A5F9EC, true);
+            hk::put<bool>(0x142A63F1C, true);
 
             // IsIntroSequenceComplete always returns true
-            hk::put<uint32_t>(0x140CBAB00, 0x90C301B0);
+            hk::put<uint32_t>(0x140CBC160, 0x90C301B0);
 
             // IsIntroMovieComplete always returns true
-            hk::put<uint32_t>(0x140CBAA80, 0x90C301B0);
+            hk::put<uint32_t>(0x140CBC0E0, 0x90C301B0);
         }
 
-        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF6470);
+        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF5450);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            auto game_state = *(uint32_t *)0x142A5F9C4;
+            auto game_state = *(uint32_t *)0x142A63EBC;
             if (game_state == 3) {
                 if (!jc::Base::CClock::instance().m_paused) {
                     if (Input::Get()->WndProc(uMsg, wParam, lParam)) {
@@ -89,7 +91,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             return wndproc.call(hwnd, uMsg, wParam, lParam);
         });
 
-        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140DF4E90);
+        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140DF6C30);
         flip.inject([](jc::HDevice_t *device) -> void {
             Graphics::Get()->BeginDraw(device);
 

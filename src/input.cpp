@@ -14,7 +14,7 @@ void Input::EnableInput(bool toggle)
 {
     static void *input_thingy = nullptr;
     if (!input_thingy) {
-        input_thingy = *(void **)0x142A86B70;
+        input_thingy = *(void **)0x142A8B030;
         m_history.push_back("");
     }
 
@@ -29,10 +29,10 @@ void Input::EnableInput(bool toggle)
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
-        hk::func_call<void>(0x140E18EF0, input_thingy);
+        hk::func_call<void>(0x140E1B790, input_thingy);
     } else {
         // restore
-        hk::func_call<void>(0x140E18E40, input_thingy);
+        hk::func_call<void>(0x140E1B6E0, input_thingy);
     }
 }
 
@@ -122,8 +122,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
                         // previous hint item
                         else {
-                            auto size     = m_hints.size();
-                            m_currentHint = std::clamp<int32_t>(--m_currentHint, 0, size < 10 ? size : 10);
+                            m_currentHint = std::max(--m_currentHint, 0);
                         }
 
                         return true;
@@ -145,8 +144,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
                         // next hint item
                         else {
-                            auto size     = m_hints.size();
-                            m_currentHint = std::clamp<int32_t>(++m_currentHint, 0, size < 10 ? size : 10);
+                            m_currentHint = std::min(++m_currentHint, static_cast<int32_t>(m_hints.size() - 1));
                         }
 
                         return true;

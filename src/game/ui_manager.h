@@ -17,13 +17,13 @@ class CUIManager
   public:
     static CUIManager& instance()
     {
-        return **(CUIManager**)0x142A5EBF8;
+        return **(CUIManager**)0x142A630F8;
     }
 
   public:
     char _pad[0x20A];
     bool m_enabled;
-    char _pad2[0xCD];
+    char _pad2[0x15D];
     struct {
         char     _pad[0x38];
         CUIBase* m_vehicle;
