@@ -6,9 +6,11 @@ class WorldCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char*, 2> m_Hints = {
+    std::array<const char*, 4> m_Hints = {
         "time",
         "timescale",
+        "gravity",
+        "resetgravity",
     };
     // clang-format on
 
@@ -19,6 +21,7 @@ class WorldCommand : public ICommand
 
     virtual bool Handler(const std::string& arguments) override
     {
+        static auto World     = *(void**)0x142A8D430;
         static auto WorldTime = *(void**)0x142A4B270;
 
         // time
@@ -37,6 +40,19 @@ class WorldCommand : public ICommand
                 *(float*)((char*)WorldTime + 0xE4) = std::clamp(timescale, -1000.0f, 1000.0f);
                 return true;
             }
+        }
+        // gravity
+        else if (arguments.find("gravity ") != std::string::npos) {
+            float gravity = -9.810f;
+            if (sscanf_s(arguments.c_str(), "gravity %f", &gravity) == 1) {
+                *(float*)((char*)World + 0x974) = std::clamp(gravity, -5000.0f, 5000.0f);
+                return true;
+            }
+        }
+        // reset gravity
+        else if (arguments.find("resetgravity") != std::string::npos) {
+            *(float*)((char*)World + 0x974) = -9.810f;
+            return true;
         }
 
         return false;

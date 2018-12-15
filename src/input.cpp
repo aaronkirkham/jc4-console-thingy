@@ -300,12 +300,12 @@ bool Input::UpdateCurrentCommand(bool update_hints)
 void Input::AddToHistory(const std::string &command)
 {
     if (m_history.back() != command) {
-        m_history.push_back(command);
-
         // clear after 100 entries
         if (m_history.size() > 100) {
             m_history.clear();
             m_history[0] = "";
         }
+
+        m_history.push_back(command);
     }
 }
