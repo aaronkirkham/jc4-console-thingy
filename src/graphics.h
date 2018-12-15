@@ -23,6 +23,13 @@ class Graphics : public Singleton<Graphics>
     Graphics()  = default;
     ~Graphics() = default;
 
+    void Shutdown()
+    {
+        m_ready = false;
+        m_state.releaseSavedState();
+        m_font->Release();
+    }
+
     void BeginDraw(jc::HDevice_t* device)
     {
         if (!m_ready && device) {

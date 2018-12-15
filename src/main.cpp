@@ -102,6 +102,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
             flip.call(device);
         });
+    } else if (fdwReason == DLL_PROCESS_DETACH) {
+        Graphics::Get()->Shutdown();
     }
 
     return TRUE;
