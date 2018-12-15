@@ -6,7 +6,7 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
 ### How to Install
  - Download the latest version from [releases](https://github.com/aaronkirkham/jc4-console-thingy/releases)
  - Extract `xinput9_1_0.dll` to your Just Cause 4 installation folder
- - Start the game and press the tilde key (`~) to open the console
+ - Start the game and press the tilde key (\`~) to open the console
  - ***OPTIONAL*** - Enable super fast game loading with the `-quickstart` launch argument via Steam
 
 ### Commands
@@ -15,6 +15,7 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
  - `world` - Change world parameters
 
 ### Controls
+ - `Tilde` (\`~) - Toggle the input
  - `Escape` - Clear current input text
  - `Up/Down Arrows` - Navigate the input history
  - `TAB` - Change focus to the hints list
