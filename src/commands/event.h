@@ -5,8 +5,7 @@
 class EventCommand : public ICommand
 {
   public:
-    // clang-format off
-    std::array<const char*, 11> m_Hints = {
+    std::array<const char*, 13> m_Hints = {
         "__showfps",
         "__reload_world",
         "ply.unlimitedammo.enable",
@@ -18,8 +17,9 @@ class EventCommand : public ICommand
         "moon_gravity_on",
         "moon_gravity_off",
         "debug.vehicle.incrementtint",
+        "vocals.rico.enable",
+        "vocals.rico.disable",
     };
-    // clang-format on
 
     virtual const char* GetCommand() override
     {

@@ -5,14 +5,12 @@
 class WorldCommand : public ICommand
 {
   public:
-    // clang-format off
     std::array<const char*, 4> m_Hints = {
         "time",
         "timescale",
         "gravity",
         "resetgravity",
     };
-    // clang-format on
 
     virtual const char* GetCommand() override
     {

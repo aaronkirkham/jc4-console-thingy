@@ -76,8 +76,10 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF5450);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
             auto game_state = *(uint32_t *)0x142A63EBC;
-            if (game_state == 3) {
-                if (!jc::Base::CClock::instance().m_paused) {
+            auto clock      = &jc::Base::CClock::instance();
+
+            if (game_state == 3 && clock) {
+                if (!clock->m_paused) {
                     if (Input::Get()->WndProc(uMsg, wParam, lParam)) {
                         return 0;
                     }

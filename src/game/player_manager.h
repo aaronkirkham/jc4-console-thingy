@@ -17,7 +17,7 @@ class CPlayerManager
     {
         auto inst = &instance();
         if (inst && inst->m_localPlayer && inst->m_localPlayer->m_character) {
-            return instance().m_localPlayer->m_character;
+            return inst->m_localPlayer->m_character;
         }
 
         return nullptr;

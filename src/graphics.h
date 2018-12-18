@@ -27,7 +27,10 @@ class Graphics : public Singleton<Graphics>
     {
         m_ready = false;
         m_state.releaseSavedState();
-        m_font->Release();
+
+        if (m_font) {
+            m_font->Release();
+        }
     }
 
     void BeginDraw(jc::HDevice_t* device)

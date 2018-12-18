@@ -2,6 +2,7 @@
 
 #include "graphics.h"
 #include "input.h"
+#include "util.h"
 #include "vector.h"
 
 #include "hooking/hooking.h"
@@ -84,7 +85,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
         case WM_KEYDOWN: {
             // tilde key down and the previous key state was up
             const auto vsc = MapVirtualKeyEx(static_cast<int32_t>(wParam), MAPVK_VK_TO_VSC, GetKeyboardLayout(0));
-            if (vsc == 41 && (static_cast<uint32_t>(lParam) >> 30) == 0) {
+            if ((vsc == 41 || wParam == VK_F1) && (lParam >> 30) == 0) {
                 EnableInput(!IsInputEnabled());
                 return true;
             }
@@ -94,10 +95,23 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
             // handle history navigation
             if (m_drawInput) {
                 switch (wParam) {
+                    // handle CTRL + V
+                    case 0x56: {
+                        if (GetAsyncKeyState(VK_CONTROL) && (lParam >> 30) == 0) {
+                            m_selectedHint = -1;
+                            m_hintPage     = 0;
+                            m_history[0].append(util::GetClipboard());
+                            UpdateCurrentCommand();
+                            return true;
+                        }
+
+                        break;
+                    }
+
                     case VK_ESCAPE: {
                         if (m_selectedHint == -1) {
                             if (m_history[0].size() > 0) {
-                                m_history[0].clear();
+                                m_history[0]     = "";
                                 m_cmdText        = "";
                                 m_cmdArguments   = "";
                                 m_currentHistory = 0;
@@ -146,7 +160,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                                 m_history[0] = m_history[m_currentHistory];
                             } else if (m_currentHistory == (m_history.size() - 1)) {
                                 m_currentHistory = 0;
-                                m_history[0].clear();
+                                m_history[0]     = "";
                             }
 
                             UpdateCurrentCommand(false);
@@ -209,8 +223,8 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
 
                         const auto input_text = m_history[0];
-                        m_history[0].clear();
-                        m_currentHistory = 0;
+                        m_history[0]          = "";
+                        m_currentHistory      = 0;
 
                         if (m_cmd) {
                             if (m_cmd->Handler(m_cmdArguments)) {
