@@ -8,7 +8,7 @@ class CClock
   public:
     static CClock& instance()
     {
-        return **(CClock**)0x142A1FCC0;
+        return **(CClock**)0x142A1B7C0;
     }
 
   public:
