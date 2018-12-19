@@ -27,9 +27,14 @@ void Input::EnableInput(bool toggle)
     m_hintPage       = 0;
 
     // toggle hud which might get in the way (bottomleft)
-    auto &ui_manager                            = jc::CUIManager::instance();
-    ui_manager.m_unknown->m_bottomLeft->m_state = toggle ? 1 : 2;
-    ui_manager.m_unknown->m_vehicle->m_state    = toggle ? 1 : 2;
+    auto &ui_manager      = jc::CUIManager::instance();
+    auto  hud_vehicle     = ui_manager.GetUI(0x8AC05ABA);
+    auto  hud_bottom_left = ui_manager.GetUI(0x5F62FEDF);
+
+    if (hud_vehicle && hud_bottom_left) {
+        hud_vehicle->m_state     = toggle ? 1 : 2;
+        hud_bottom_left->m_state = toggle ? 1 : 2;
+    }
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back

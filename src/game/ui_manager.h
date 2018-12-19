@@ -8,8 +8,11 @@ namespace jc
 class CUIBase
 {
   public:
-    char    pad[0x140];
-    uint8_t m_state;
+    char        _pad[0x140];
+    uint8_t     m_state;
+    char        _pad2[0x7];
+    std::string m_name;
+    uint32_t    m_nameHash;
 };
 
 class CUIManager
@@ -20,16 +23,19 @@ class CUIManager
         return **(CUIManager**)0x142A630F8;
     }
 
+    CUIBase* GetUI(uint32_t name_hash)
+    {
+        auto it = std::find_if(m_uis.begin(), m_uis.end(),
+                               [name_hash](const CUIBase* ui) { return ui->m_nameHash == name_hash; });
+        return (it != m_uis.end()) ? (*it) : nullptr;
+    }
+
   public:
-    char _pad[0x20A];
-    bool m_enabled;
-    char _pad2[0x15D];
-    struct {
-        char     _pad[0x38];
-        CUIBase* m_vehicle;
-        char     _pad2[0x8];
-        CUIBase* m_bottomLeft;
-    } * m_unknown;
+    char                  _pad[0x29A];
+    bool                  m_enabled;
+    bool                  m_debugTextEnabled;
+    char                  _pad2[0xCC];
+    std::vector<CUIBase*> m_uis;
 };
 }; // namespace jc
 #pragma pack(pop)
