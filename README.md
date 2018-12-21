@@ -27,6 +27,5 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
 #### Building
 If you want to compile the code yourself, you will need **Visual Studio 2017 or later** (or a compiler which supports C++17 nested namespaces)
  - Clone this repository
- - Run `git submodule update --init`
  - Run `configure.ps1` with PowerShell
  - Build `out/jc4-console-thing.sln` in Visual Studio
