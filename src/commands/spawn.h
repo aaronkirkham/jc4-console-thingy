@@ -294,7 +294,7 @@ class SpawnCommand : public ICommand
         "wpn_204_mortar_mounted",
         "wpn_204_mortar_mounted_rebel",
         "illapa_defence_weapon",
-        "wpn_800_combat_rifle_cow_gun",
+        "cow_gun",
         "wpn_990_premium_wingsuit_bullet_streamer",
 
         // CHARACTERS
