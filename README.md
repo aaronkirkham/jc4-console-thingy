@@ -10,7 +10,7 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
  - ***OPTIONAL*** - Enable super fast game loading with the `-quickstart` launch argument via Steam
 
 ### Commands
- - `spawn` - Spawn everything! Vehicles, characters, animals & props.
+ - `spawn` - Spawn everything! Vehicles, characters, animals & props. By default, autocomplete displays suggestions for "spawn specifiers," or adjectives that describe entities (e.g. "vehicle," "weapon," or "sniper"). Chain multiple of these together with commas to narrow down which entities to choose from, or, instead, place a `!` at the start of the parameter to see suggestions for entity names to spawn directly.
  - `event` - Trigger game events - **CAUTION** - Stick to using only the hints, unless you know what the event does
  - `world` - Change world parameters
 

@@ -38,11 +38,13 @@ class Input : public Singleton<Input>
 
     void RegisterCommand(std::unique_ptr<ICommand> cmd)
     {
+        cmd->Initialize();
         m_commands[cmd->GetCommand()] = std::move(cmd);
     }
 
     void RegisterCommand(const std::string& command, std::unique_ptr<ICommand> cmd)
     {
+        cmd->Initialize();
         m_commands[command] = std::move(cmd);
     }
 
