@@ -7,6 +7,8 @@
 
 class SpawnCommand : public ICommand
 {
+
+#pragma pack(push, 1)
     struct PropertyFileEntry {
         uint32_t hash;
         uint32_t data;
@@ -18,6 +20,7 @@ class SpawnCommand : public ICommand
         PropertyFileEntry *entry;
         uint8_t            error;
     };
+#pragma pack(pop)
 
     struct Spawnable {
         std::string              model;
