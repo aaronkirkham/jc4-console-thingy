@@ -31,8 +31,23 @@ class SpawnCommand : public ICommand
 
     virtual void Initialize() override
     {
-        hk::inject_call<PropertyFileResult *, void *, PropertyFileResult *, uint32_t> add_event_hook(0x140A08310);
-        add_event_hook.inject(AddModelName);
+        static hk::inject_call<PropertyFileResult *, void *, PropertyFileResult *, uint32_t> add_event_hook(0x140A08310);
+        add_event_hook.inject([](void *file, PropertyFileResult *buf, uint32_t hash) {
+            Spawnable          s;
+            PropertyFileResult model;
+            PropertyFileResult specifiers;
+
+            add_event_hook.call(file, &model, 0xF71C2A21);
+            add_event_hook.call(file, &specifiers, 0x54697E8F);
+
+            if (model.entry && specifiers.entry) {
+                s.model      = (char *)(model.base + model.entry->data);
+                s.specifiers = SplitSpecifiers((char *)(specifiers.base + specifiers.entry->data));
+                m_Hints.push_back(s);
+            }
+
+            return add_event_hook.call(file, buf, hash);
+        });
     }
 
     static std::vector<std::string> SplitSpecifiers(const std::string &input)
@@ -52,24 +67,6 @@ class SpawnCommand : public ICommand
             result.push_back(std::string(&input[lastDelim], i - lastDelim));
         }
         return result;
-    }
-
-    static PropertyFileResult *AddModelName(void *file, PropertyFileResult *buf, uint32_t hash)
-    {
-        Spawnable          s;
-        PropertyFileResult model;
-        PropertyFileResult specifiers;
-
-        hk::func_call<PropertyFileResult *>(0x140087E60, file, &model, 0xF71C2A21);
-        hk::func_call<PropertyFileResult *>(0x140087E60, file, &specifiers, 0x54697E8F);
-
-        if (model.entry && specifiers.entry) {
-            s.model      = (char *)(model.base + model.entry->data);
-            s.specifiers = SplitSpecifiers((char *)(specifiers.base + specifiers.entry->data));
-            m_Hints.push_back(s);
-        }
-
-        return hk::func_call<PropertyFileResult *>(0x140087E60, file, buf, hash);
     }
 
     virtual const char *GetCommand() override
