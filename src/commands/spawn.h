@@ -30,7 +30,13 @@ class SpawnCommand : public ICommand
     inline static const std::string delims = ", |";
 
   public:
-    inline static std::vector<Spawnable> m_Hints = {};
+    inline static std::vector<Spawnable>      m_Hints = {};
+    inline const static std::set<std::string> banned  = {
+		"rico_debug",
+		"rico_preview_debug",
+		"rico_cow_skin",
+		"rico_cow_skin_debug"
+	};
 
     virtual void Initialize() override
     {
@@ -45,8 +51,10 @@ class SpawnCommand : public ICommand
 
             if (model.entry && specifiers.entry) {
                 s.model      = (char *)(model.base + model.entry->data);
-                s.specifiers = SplitSpecifiers((char *)(specifiers.base + specifiers.entry->data));
-                m_Hints.push_back(s);
+                if (banned.find(s.model) == banned.end()) {
+					s.specifiers = SplitSpecifiers((char *)(specifiers.base + specifiers.entry->data));
+					m_Hints.push_back(s);
+				}
             }
 
             return add_event_hook.call(file, buf, hash);
@@ -88,7 +96,7 @@ class SpawnCommand : public ICommand
         transform.m[3].y = aimpos.y + 1.0f;
         transform.m[3].z = aimpos.z;
 
-        if (arguments.length() == 0) {
+        if (arguments.length() == 0 || banned.find(arguments) != banned.end()) {
             return false;
         }
 
