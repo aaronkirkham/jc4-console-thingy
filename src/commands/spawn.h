@@ -6,7 +6,7 @@ class SpawnCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char *, 426> m_Hints = {
+    std::array<const char *, 433> m_Hints = {
         // VEHICLES
         "v000_car_atv_civilian_01",
         "v000_car_atv_javi",
