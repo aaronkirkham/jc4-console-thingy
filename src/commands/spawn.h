@@ -6,7 +6,7 @@ class SpawnCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char *, 426> m_Hints = {
+    std::array<const char *, 433> m_Hints = {
         // VEHICLES
         "v000_car_atv_civilian_01",
         "v000_car_atv_javi",
@@ -57,6 +57,7 @@ class SpawnCommand : public ICommand
         "v024_car_ecosuper_bomb_special",
         "v024_car_ecosuper_civilian_01",
         "v024_car_ecosuper_racing_01",
+        "v024_car_ecosuper_preorder_01",  // DLC_NeonRacer. EcoSuper Spoilers are diff. Havent checked speed diff. It comes with Neon, I guess.
         "v025_car_vintagesuper_bomb_special",
         "v025_car_vintagesuper_civilian_01",
         "v026_car_vintagesports_bomb_special",
@@ -100,6 +101,7 @@ class SpawnCommand : public ICommand
         "v046_car_racingbuggy_civilian",
         "v046_car_racingbuggy_military",
         "v046_car_racingbuggy_racing_01",
+        "v046_car_racingbuggy_preorder_01", //DLC_DeathStalker. A Weaponised Buggy w/ a Machine Gun on the hood. Personally modified by Rico. Havent checked speeds. I will leave a Screenshot https://imgur.com/78ePUOE
         // "v047_car_",
         // "v048_car_",
         // "v049_car_",
@@ -184,6 +186,7 @@ class SpawnCommand : public ICommand
         "v402_plane_fighterbomber_rebel_01",
         "v403_plane_microjet_military",
         "v403_plane_microjet_rebel",
+        "v403_plane_microjet_preorder_01",  // DLC_DigitalDeluxe. Its a "Black Hand Stealth Micro Jet". Havent checked speed diff.
         "v404_plane_privatejet_civilian",
         "v405_plane_commercialcargo_commercial",
         "v406_plane_smallprop_civilian_01",
@@ -295,7 +298,11 @@ class SpawnCommand : public ICommand
         "wpn_204_mortar_mounted_rebel",
         "illapa_defence_weapon",
         "cow_gun",
+        "wpn_901_signature_rifle",      // DLC_DeathStalker Signature Rifle.Rico's fav.Explosive Assault Rifle, its Love. Is there anything else I can say?
+        "wpn_902_golden_shotgun",      // DLC_GoldenGear Shotgun. A Golden Gear Shotgun featuring Ricochet tracer in secondary fire.
+        "wpn_903_renegade_assault_rifle",    // DLC_Renegade. Bullshark Assault Rifle. A Rifle that spawns Drone. Pretty Cool, right? 
         "wpn_990_premium_wingsuit_bullet_streamer",
+        "wpn_991_premium_wingsuit_dragon_breath", // DLC_DigitalDeluxe. Both Wingsuits (990,991) dont work.
 
         // CHARACTERS
         "cow",
