@@ -101,7 +101,7 @@ class SpawnCommand : public ICommand
         "v046_car_racingbuggy_civilian",
         "v046_car_racingbuggy_military",
         "v046_car_racingbuggy_racing_01",
-        "v046_car_racingbuggy_preorder_01", //DLC_DeathStalker. A Weaponised Buggy w/ a Machine Gun on the hood. Personally modified by Rico. Havent checked speeds.
+        "v046_car_racingbuggy_preorder_01", //DLC_DeathStalker. A Weaponised Buggy w/ a Machine Gun on the hood. Personally modified by Rico. Havent checked speeds. I will leave a Screenshot https://imgur.com/78ePUOE
         // "v047_car_",
         // "v048_car_",
         // "v049_car_",
