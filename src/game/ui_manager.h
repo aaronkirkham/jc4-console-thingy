@@ -20,7 +20,7 @@ class CUIManager
   public:
     static CUIManager& instance()
     {
-        return **(CUIManager**)0x142A630F8;
+        return **(CUIManager**)0x142A65310;
     }
 
     CUIBase* GetUI(uint32_t name_hash)
