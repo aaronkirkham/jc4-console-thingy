@@ -75,16 +75,18 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF5610);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            auto game_state = *(uint32_t *)0x142A660BC;
-            auto clock      = &jc::Base::CClock::instance();
+            auto game_state   = *(uint32_t *)0x142A660BC;
+            auto suspend_game = *(bool *)0x142A695F0;
+            auto clock        = &jc::Base::CClock::instance();
 
             if (game_state == 3 && clock) {
-                if (!clock->m_paused) {
+                if (!suspend_game && !clock->m_paused) {
                     if (Input::Get()->WndProc(uMsg, wParam, lParam)) {
                         return 0;
                     }
                 }
-                // disable input if the clock is paused and input is still enabled somehow
+                // disable input if the game is suspended or the clock is paused.
+                // This fixes issues with window messages not being handled as we stole the message
                 else if (Input::Get()->IsInputEnabled()) {
                     Input::Get()->EnableInput(false);
                 }
