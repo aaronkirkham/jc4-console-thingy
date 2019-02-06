@@ -38,10 +38,10 @@ void Input::EnableInput(bool toggle)
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
-        hk::func_call<void>(0x140E1D770, input_thingy);
+        hk::func_call<void>(0x140E1D6A0, input_thingy);
     } else {
         // restore
-        hk::func_call<void>(0x140E1D6C0, input_thingy);
+        hk::func_call<void>(0x140E1D5F0, input_thingy);
     }
 }
 

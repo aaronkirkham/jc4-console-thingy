@@ -37,7 +37,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         }
 
         // if we are running on the wrong version, don't continue
-        if (*(uint32_t *)0x141C7DF70 != 0x6c617641) {
+        if (*(uint32_t *)0x141C7DF60 != 0x6c617641) {
 #ifdef DEBUG
             MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
 #endif
@@ -67,13 +67,13 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             hk::put<bool>(0x142A6611C, true);
 
             // IsIntroSequenceComplete always returns true
-            hk::put<uint32_t>(0x140CBE0A0, 0x90C301B0);
+            hk::put<uint32_t>(0x140CBE070, 0x90C301B0);
 
             // IsIntroMovieComplete always returns true
-            hk::put<uint32_t>(0x140CBE020, 0x90C301B0);
+            hk::put<uint32_t>(0x140CBDFF0, 0x90C301B0);
         }
 
-        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF5610);
+        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140AF55E0);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
             auto game_state   = *(uint32_t *)0x142A660BC;
             auto suspend_game = *(bool *)0x142A695F0;
@@ -95,7 +95,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             return wndproc.call(hwnd, uMsg, wParam, lParam);
         });
 
-        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140DF8C40);
+        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140DF8B70);
         flip.inject([](jc::HDevice_t *device) -> void {
             Graphics::Get()->BeginDraw(device);
 

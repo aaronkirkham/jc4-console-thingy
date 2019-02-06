@@ -27,7 +27,7 @@ class WorldCommand : public ICommand
             float time = 0.0f;
             if (sscanf_s(arguments.c_str(), "time %f", &time) == 1) {
                 time = std::clamp(time, -24.0f, 24.0f);
-                hk::func_call<void>(0x144F537C0, WorldTime, time, 2);
+                hk::func_call<void>(0x144F06D20, WorldTime, time, 2);
                 return true;
             }
         }
