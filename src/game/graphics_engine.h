@@ -10,7 +10,7 @@ class CGraphicsEngine
   public:
     static CGraphicsEngine& instance()
     {
-        return **(CGraphicsEngine**)0x142A42F60;
+        return **(CGraphicsEngine**)0x142A443E0;
     }
 
   public:
