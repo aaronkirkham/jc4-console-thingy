@@ -7,7 +7,6 @@
 
 #include "hooking/hooking.h"
 
-#include "game/graphics_engine.h"
 #include "game/render_engine.h"
 #include "game/ui_manager.h"
 
@@ -17,7 +16,7 @@ void Input::EnableInput(bool toggle)
 {
     static void *input_thingy = nullptr;
     if (!input_thingy) {
-        input_thingy = *(void **)0x142A8E6F0;
+        input_thingy = *(void **)0x142BD5970;
         m_history.push_back("");
     }
 
@@ -38,16 +37,15 @@ void Input::EnableInput(bool toggle)
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
-        hk::func_call<void>(0x140E1DDB0, input_thingy);
+        hk::func_call<void>(0x140EF5540, input_thingy);
     } else {
         // restore
-        hk::func_call<void>(0x140E1DD00, input_thingy);
+        hk::func_call<void>(0x140EF5490, input_thingy);
     }
 }
 
-void Input::Draw()
+void Input::Draw(jc::HDevice_t* device)
 {
-    auto device         = jc::NGraphicsEngine::CGraphicsEngine::instance().m_device;
     auto debug_renderer = jc::CRenderEngine::instance().m_debugRenderer;
 
     static const float _hintItemHeight = 0.02f;

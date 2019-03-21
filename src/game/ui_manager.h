@@ -10,7 +10,7 @@ class CUIBase
   public:
     char        _pad[0x140];
     uint8_t     m_state;
-    char        _pad2[0x7];
+    char        _pad2[0x1F];
     std::string m_name;
     uint32_t    m_nameHash;
 };
@@ -20,7 +20,7 @@ class CUIManager
   public:
     static CUIManager& instance()
     {
-        return **(CUIManager**)0x142A66790;
+        return **(CUIManager**)0x142BAA628;
     }
 
     CUIBase* GetUI(uint32_t name_hash)

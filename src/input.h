@@ -57,6 +57,6 @@ class Input : public Singleton<Input>
         return m_drawInput;
     }
 
-    void Draw();
+    void Draw(jc::HDevice_t* device);
     bool WndProc(uint32_t message, WPARAM wParam, LPARAM lParam);
 };

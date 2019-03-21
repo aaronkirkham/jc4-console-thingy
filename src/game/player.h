@@ -17,7 +17,7 @@ class CPlayer
   public:
     char               _pad[0x68];
     CCharacter*        m_character;
-    char               _pad2[0x138];
+    char               _pad2[0x160];
     CPlayerAimControl* m_aimControl;
 };
 }; // namespace jc

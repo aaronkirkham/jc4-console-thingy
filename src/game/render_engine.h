@@ -10,11 +10,11 @@ class CRenderEngine
   public:
     static CRenderEngine& instance()
     {
-        return **(CRenderEngine**)0x142A23828;
+        return **(CRenderEngine**)0x142B68CD8;
     }
 
   public:
-    char               _pad[0x2BB0];
+    char               _pad[0x2BC8];
     DebugRendererImpl* m_debugRenderer;
 };
 }; // namespace jc
