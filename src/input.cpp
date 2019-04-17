@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "graphics.h"
+#include "hashlittle.h"
 #include "input.h"
 #include "util.h"
 #include "vector.h"
@@ -16,7 +17,7 @@ void Input::EnableInput(bool toggle)
 {
     static void *input_thingy = nullptr;
     if (!input_thingy) {
-        input_thingy = *(void **)0x142BD5970;
+        input_thingy = *(void **)0x142BD4470;
         m_history.push_back("");
     }
 
@@ -25,10 +26,13 @@ void Input::EnableInput(bool toggle)
     m_selectedHint   = -1;
     m_hintPage       = 0;
 
+    static const auto hud_vehicle_hash     = "hud_vehicle"_hash_little;
+    static const auto hud_bottom_left_hash = "hud_bottom_left"_hash_little;
+
     // toggle hud which might get in the way (bottomleft)
     auto &ui_manager      = jc::CUIManager::instance();
-    auto  hud_vehicle     = ui_manager.GetUI(0x8AC05ABA);
-    auto  hud_bottom_left = ui_manager.GetUI(0x5F62FEDF);
+    auto  hud_vehicle     = ui_manager.GetUI(hud_vehicle_hash);
+    auto  hud_bottom_left = ui_manager.GetUI(hud_bottom_left_hash);
 
     if (hud_vehicle && hud_bottom_left) {
         hud_vehicle->m_state     = toggle ? 1 : 2;
@@ -37,14 +41,14 @@ void Input::EnableInput(bool toggle)
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
-        hk::func_call<void>(0x140EF5540, input_thingy);
+        hk::func_call<void>(0x140F01350, input_thingy);
     } else {
         // restore
-        hk::func_call<void>(0x140EF5490, input_thingy);
+        hk::func_call<void>(0x140F012A0, input_thingy);
     }
 }
 
-void Input::Draw(jc::HDevice_t* device)
+void Input::Draw(jc::HDevice_t *device)
 {
     auto debug_renderer = jc::CRenderEngine::instance().m_debugRenderer;
 

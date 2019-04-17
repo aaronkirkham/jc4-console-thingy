@@ -482,6 +482,11 @@ class SpawnCommand : public ICommand
 
     virtual bool Handler(const std::string &arguments) override
     {
+        if (arguments == "rico_debug" || arguments == "rico_preview_debug" || arguments == "rico_cow_skin"
+            || arguments == "rico_cow_skin_debug") {
+            return false;
+        }
+
         auto  local_player = jc::CPlayerManager::instance().m_localPlayer;
         auto  transform    = local_player->m_character->m_transform;
         auto &aimpos       = local_player->m_aimControl->m_aimPos;

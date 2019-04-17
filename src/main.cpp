@@ -37,7 +37,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         }
 
         // if we are running on the wrong version, don't continue
-        if (*(uint32_t *)0x141D8C800 != 0x6c617641) {
+        if (*(uint32_t *)0x141D980D0 != 0x6c617641) {
 #ifdef DEBUG
             MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
 #endif
@@ -64,19 +64,19 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         // enable quick start
         if (quick_start) {
             // quick start
-            hk::put<bool>(0x142BAD290, true);
+            hk::put<bool>(0x142BABD04, true);
 
             // IsIntroSequenceComplete always returns true
-            hk::put<uint32_t>(0x140DCFBE0, 0x90C301B0);
+            hk::put<uint32_t>(0x140DDB350, 0x90C301B0);
 
             // IsIntroMovieComplete always returns true
-            hk::put<uint32_t>(0x140DCFB60, 0x90C301B0);
+            hk::put<uint32_t>(0x140DDB2D0, 0x90C301B0);
         }
 
-        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140BC7D10);
+        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140BD0D90);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            auto game_state   = *(uint32_t *)0x142BAD250;
-            auto suspend_game = *(bool *)0x142BB1B10;
+            auto game_state   = *(uint32_t *)0x142BABF3C;
+            auto suspend_game = *(bool *)0x142BB05A0;
             auto clock        = &jc::Base::CClock::instance();
 
             if (game_state == 3 && clock) {
@@ -95,7 +95,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             return wndproc.call(hwnd, uMsg, wParam, lParam);
         });
 
-        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140ED09D0);
+        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140EDC670);
         flip.inject([](jc::HDevice_t *device) -> void {
             Graphics::Get()->BeginDraw(device);
 
