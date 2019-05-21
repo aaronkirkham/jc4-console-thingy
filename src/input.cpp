@@ -17,7 +17,7 @@ void Input::EnableInput(bool toggle)
 {
     static void *input_thingy = nullptr;
     if (!input_thingy) {
-        input_thingy = *(void **)0x142BD4470;
+        input_thingy = *(void **)0x142C51270;
         m_history.push_back("");
     }
 
@@ -41,10 +41,10 @@ void Input::EnableInput(bool toggle)
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
-        hk::func_call<void>(0x140F01350, input_thingy);
+        hk::func_call<void>(0x140F58C60, input_thingy);
     } else {
         // restore
-        hk::func_call<void>(0x140F012A0, input_thingy);
+        hk::func_call<void>(0x140F58BB0, input_thingy);
     }
 }
 

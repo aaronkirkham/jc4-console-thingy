@@ -20,7 +20,7 @@ class CUIManager
   public:
     static CUIManager& instance()
     {
-        return **(CUIManager**)0x142BA9080;
+        return **(CUIManager**)0x142C27848;
     }
 
     CUIBase* GetUI(uint32_t name_hash)
@@ -31,7 +31,7 @@ class CUIManager
     }
 
   public:
-    char                  _pad[0x378];
+    char                  _pad[0x380];
     std::vector<CUIBase*> m_uis;
 };
 }; // namespace jc
