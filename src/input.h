@@ -17,7 +17,7 @@ class Input : public Singleton<Input>
 
   private:
     bool                     m_drawInput = false;
-    std::vector<std::string> m_history;
+    std::vector<std::string> m_history        = {""};
     int32_t                  m_currentHistory = 0;
     ICommand*                m_cmd            = nullptr;
     std::string              m_cmdText        = "";

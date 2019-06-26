@@ -8,6 +8,7 @@
 
 #include "hooking/hooking.h"
 
+#include "game/input_manager.h"
 #include "game/render_engine.h"
 #include "game/ui_manager.h"
 
@@ -15,12 +16,6 @@ static const int32_t _numHintsPerPage = 10;
 
 void Input::EnableInput(bool toggle)
 {
-    static void *input_thingy = nullptr;
-    if (!input_thingy) {
-        input_thingy = *(void **)0x142C51270;
-        m_history.push_back("");
-    }
-
     m_drawInput      = toggle;
     m_currentHistory = 0;
     m_selectedHint   = -1;
@@ -41,10 +36,10 @@ void Input::EnableInput(bool toggle)
 
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
-        hk::func_call<void>(0x140F58C60, input_thingy);
+        jc::NInput::CManagerBase::instance().LoseFocus();
     } else {
         // restore
-        hk::func_call<void>(0x140F58BB0, input_thingy);
+        jc::NInput::CManagerBase::instance().GainFocus();
     }
 }
 
