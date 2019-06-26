@@ -13,15 +13,15 @@ class CManagerBase
         return **(CManagerBase**)0x142C7DAF0;
     }
 
-	void LoseFocus()
-	{
+    void LoseFocus()
+    {
         hk::func_call<void>(0x140F7D3E0, this);
-	}
+    }
 
-	void GainFocus()
-	{
+    void GainFocus()
+    {
         hk::func_call<void>(0x140F7D330, this);
-	}
+    }
 };
-}; // namespace jc
+}; // namespace jc::NInput
 #pragma pack(pop)
