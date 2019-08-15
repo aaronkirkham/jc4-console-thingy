@@ -6,7 +6,7 @@ class SpawnCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char *, 433> m_Hints = {
+    std::array<const char *, 444> m_Hints = {
         // VEHICLES
         "v000_car_atv_civilian_01",
         "v000_car_atv_javi",
@@ -106,6 +106,9 @@ class SpawnCommand : public ICommand
         // "v048_car_",
         // "v049_car_",
         "v050_car_toyjeep_civilian",
+        "v084_car_icecreamtruck_garage",
+        "v085_car_explosivetrike_garage",
+        "v117_boat_duck_garage",
 
         // boats
         "v100_boat_fanboat_civilian",
@@ -263,8 +266,8 @@ class SpawnCommand : public ICommand
         "wpn_000_assault_rifle",
         "wpn_001_assault_rifle",
         "wpn_003_assault_rifle",
-        "wpn_010_machine_gun",
-        "wpn_011_machine_gun",
+        "wpn_010_machinegun",
+        "wpn_011_machinegun",
         "wpn_020_shotgun",
         "wpn_021_shotgun",
         "wpn_022_shotgun",
@@ -284,18 +287,23 @@ class SpawnCommand : public ICommand
         "wpn_102_crossbow",
         "w206_mounted_capstone_m2hm",
         "wpn_201_minigun",
+        "wpn_201_minigun_aoc",
         "wpn_201_minigun_mount",
         "wpn_201_minigun_mount_rebel",
         "wpn_201_minigun_mount_military",
         "w301_grenade",
+        "w301_frag_grenade",
         "w303_concussion_grenade",
         "w304_death_dropped_grenade",
         "wpn_202_cannon",
         "wpn_202_cannon_rebel",
+        "wpn_202_cannon_aoc",
         "wpn_203_aa_gun",
         "wpn_203_aa_gun_rebel",
+        "wpn_203_aa_gun_aoc",
         "wpn_204_mortar_mounted",
         "wpn_204_mortar_mounted_rebel",
+        "wpn_204_mortar_mounted_aoc",
         "illapa_defence_weapon",
         "cow_gun",
         "wpn_901_signature_rifle",      // DLC_DeathStalker Signature Rifle.Rico's fav.Explosive Assault Rifle, its Love. Is there anything else I can say?
@@ -303,6 +311,8 @@ class SpawnCommand : public ICommand
         "wpn_903_renegade_assault_rifle",    // DLC_Renegade. Bullshark Assault Rifle. A Rifle that spawns Drone. Pretty Cool, right? 
         "wpn_990_premium_wingsuit_bullet_streamer",
         "wpn_991_premium_wingsuit_dragon_breath", // DLC_DigitalDeluxe. Both Wingsuits (990,991) dont work.
+        "wpn_905_clusterbomb",
+        "the_pan",
 
         // CHARACTERS
         "cow",
@@ -311,6 +321,7 @@ class SpawnCommand : public ICommand
         "deer_buck",
         "dog",
         "goat",
+        "goat_bhuj",
         "tapir",
         "llama",
         "llama_02",
