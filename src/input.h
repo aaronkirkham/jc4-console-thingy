@@ -16,7 +16,7 @@ class Input : public Singleton<Input>
     using command_t = std::function<void(const std::string& arguments)>;
 
   private:
-    bool                     m_drawInput = false;
+    bool                     m_drawInput      = false;
     std::vector<std::string> m_history        = {""};
     int32_t                  m_currentHistory = 0;
     ICommand*                m_cmd            = nullptr;
@@ -57,6 +57,6 @@ class Input : public Singleton<Input>
         return m_drawInput;
     }
 
-    void Draw(jc::HDevice_t* device);
+    void Draw();
     bool WndProc(uint32_t message, WPARAM wParam, LPARAM lParam);
 };

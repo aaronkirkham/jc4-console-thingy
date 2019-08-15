@@ -495,11 +495,8 @@ class SpawnCommand : public ICommand
         transform.m[3].y = aimpos.y + 1.0f;
         transform.m[3].z = aimpos.z;
 
-        // TODO(aaronlad): figure out the flags, right now the game is holding the shared_ptr so we don't have to do it
-        jc::CSpawnSystem::instance().Spawn(arguments, transform, [](const jc::spawned_objects &objects, void *) {
-            //
-        });
-
+        // NOTE(aaronlad): spawn flag 0x8000 will prevent auto despawn
+        jc::CSpawnSystem::instance().Spawn(arguments, transform, [](const jc::spawned_objects &objects, void *) {});
         return true;
     }
 

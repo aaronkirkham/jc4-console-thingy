@@ -10,17 +10,17 @@ class CManagerBase
   public:
     static CManagerBase& instance()
     {
-        return **(CManagerBase**)0x142C7DAF0;
+        return **(CManagerBase**)0x142CD4B30;
     }
 
     void LoseFocus()
     {
-        hk::func_call<void>(0x140F7D3E0, this);
+        hk::func_call<void>(0x147C63280, this);
     }
 
     void GainFocus()
     {
-        hk::func_call<void>(0x140F7D330, this);
+        hk::func_call<void>(0x147C630D0, this);
     }
 };
 }; // namespace jc::NInput

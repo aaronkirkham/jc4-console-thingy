@@ -12,7 +12,10 @@
 #include "game/render_engine.h"
 #include "game/ui_manager.h"
 
-static const int32_t _numHintsPerPage = 10;
+static constexpr int32_t NUM_HINTS_PER_PAGE = 10;
+static constexpr float   HINT_ITEM_HEIGHT   = 0.02f;
+static constexpr float   FONT_SIZE_INPUT    = 0.0155f;
+static constexpr float   FONT_SIZE_HINT     = 0.0133f;
 
 void Input::EnableInput(bool toggle)
 {
@@ -21,13 +24,13 @@ void Input::EnableInput(bool toggle)
     m_selectedHint   = -1;
     m_hintPage       = 0;
 
-    static const auto hud_vehicle_hash     = "hud_vehicle"_hash_little;
-    static const auto hud_bottom_left_hash = "hud_bottom_left"_hash_little;
+    static const uint32_t HUD_VEHICLE_HASH     = "hud_vehicle"_hash_little;
+    static const uint32_t HUD_BOTTOM_LEFT_HASH = "hud_bottom_left"_hash_little;
 
     // toggle hud which might get in the way (bottomleft)
-    auto &ui_manager      = jc::CUIManager::instance();
-    auto  hud_vehicle     = ui_manager.GetUI(hud_vehicle_hash);
-    auto  hud_bottom_left = ui_manager.GetUI(hud_bottom_left_hash);
+    auto ui_manager      = &jc::CUIManager::instance();
+    auto hud_vehicle     = ui_manager->GetUI(HUD_VEHICLE_HASH);
+    auto hud_bottom_left = ui_manager->GetUI(HUD_BOTTOM_LEFT_HASH);
 
     if (hud_vehicle && hud_bottom_left) {
         hud_vehicle->m_state     = toggle ? 1 : 2;
@@ -43,40 +46,36 @@ void Input::EnableInput(bool toggle)
     }
 }
 
-void Input::Draw(jc::HDevice_t *device)
+void Input::Draw()
 {
     auto debug_renderer = jc::CRenderEngine::instance().m_debugRenderer;
 
-    static const float _hintItemHeight = 0.02f;
-    static const float _fontSizeInput  = 0.0155f;
-    static const float _fontSizeHint   = 0.0133f;
-
-    if (m_drawInput && (device && debug_renderer)) {
+    if (m_drawInput && debug_renderer) {
         // draw hints
         if (m_cmd && m_hints.size() > 0) {
-            const auto  count        = std::clamp<uint32_t>((m_hints.size() - m_hintPage), 0, _numHintsPerPage);
-            const float total_height = (_hintItemHeight * count);
+            const auto  count        = std::clamp<uint32_t>((m_hints.size() - m_hintPage), 0, NUM_HINTS_PER_PAGE);
+            const float total_height = (HINT_ITEM_HEIGHT * count);
 
             debug_renderer->DebugRectGradient({0, (0.94f - total_height - 0.02f)}, {0.5f, 0.94f}, 0xB4000000,
                                               0x00000000);
 
             for (uint32_t i = 0; i < count; ++i) {
                 // draw current hint
-                const float y = (0.9325f - total_height + (_hintItemHeight * i));
-                Graphics::Get()->DrawString(m_hints[i + m_hintPage], 0.0195f, y, _fontSizeHint, 0xFFFFFFFF);
+                const float y = (0.9325f - total_height + (HINT_ITEM_HEIGHT * i));
+                Graphics::Get()->DrawString(m_hints[i + m_hintPage], 0.0195f, y, FONT_SIZE_HINT, 0xFFFFFFFF);
 
                 if ((i + m_hintPage) == m_selectedHint) {
-                    Graphics::Get()->DrawString("> ", 0.0078f, y, _fontSizeHint, 0xFFFFFFFF);
+                    Graphics::Get()->DrawString("> ", 0.0078f, y, FONT_SIZE_HINT, 0xFFFFFFFF);
                 }
             }
         }
 
         // draw current input text
         debug_renderer->DebugRectGradient({0, 0.95f}, {0.5f, 1}, 0xE1000000, 0x00000000);
-        Graphics::Get()->DrawString(m_history[0], 0.0195f, 0.965f, _fontSizeInput, 0xFFFFFFFF);
+        Graphics::Get()->DrawString(m_history[0], 0.0195f, 0.965f, FONT_SIZE_INPUT, 0xFFFFFFFF);
 
         if (m_selectedHint == -1) {
-            Graphics::Get()->DrawString("> ", 0.0078f, 0.965f, _fontSizeInput, 0xFFFFFFFF);
+            Graphics::Get()->DrawString("> ", 0.0078f, 0.965f, FONT_SIZE_INPUT, 0xFFFFFFFF);
         }
     }
 }
@@ -144,8 +143,8 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
                         // previous hint item
                         else {
-                            if ((m_selectedHint % _numHintsPerPage) == 0) {
-                                m_hintPage = std::max((m_hintPage - _numHintsPerPage), 0);
+                            if ((m_selectedHint % NUM_HINTS_PER_PAGE) == 0) {
+                                m_hintPage = std::max((m_hintPage - NUM_HINTS_PER_PAGE), 0);
                             }
 
                             m_selectedHint = std::max(--m_selectedHint, 0);
@@ -174,8 +173,8 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                             if (m_selectedHint != (size - 1)) {
                                 ++m_selectedHint;
 
-                                if (size > _numHintsPerPage && (m_selectedHint % _numHintsPerPage) == 0) {
-                                    m_hintPage += _numHintsPerPage;
+                                if (size > NUM_HINTS_PER_PAGE && (m_selectedHint % NUM_HINTS_PER_PAGE) == 0) {
+                                    m_hintPage += NUM_HINTS_PER_PAGE;
                                 }
                             }
                         }

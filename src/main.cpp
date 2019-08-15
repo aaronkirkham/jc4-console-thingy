@@ -37,7 +37,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         }
 
         // if we are running on the wrong version, don't continue
-        if (*(uint32_t *)0x141E28818 != 0x6c617641) {
+        if (*(uint32_t *)0x141E732B8 != 0x6c617641) {
 #ifdef DEBUG
             MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
 #endif
@@ -64,19 +64,19 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         // enable quick start
         if (quick_start) {
             // quick start
-            hk::put<bool>(0x142C55374, true);
+            hk::put<bool>(0x142CABF28, true);
 
             // IsIntroSequenceComplete always returns true
-            hk::put<uint32_t>(0x140E4D670, 0x90C301B0);
+            hk::put<uint32_t>(0x140E8B1D0, 0x90C301B0);
 
             // IsIntroMovieComplete always returns true
-            hk::put<uint32_t>(0x140E4D5F0, 0x90C301B0);
+            hk::put<uint32_t>(0x140E8B150, 0x90C301B0);
         }
 
-        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140C3F100);
+        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140C77880);
         wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            auto game_state   = *(uint32_t *)0x142C5532C;
-            auto suspend_game = *(bool *)0x142C59B68;
+            auto game_state   = *(uint32_t *)0x142CABF0C;
+            auto suspend_game = *(bool *)0x142CB0B48;
             auto clock        = &jc::Base::CClock::instance();
 
             if (game_state == 3 && clock) {
@@ -95,12 +95,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             return wndproc.call(hwnd, uMsg, wParam, lParam);
         });
 
-        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140F57AF0);
+        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140F97DC0);
         flip.inject([](jc::HDevice_t *device) -> void {
             Graphics::Get()->BeginDraw(device);
 
             // draw input
-            Input::Get()->Draw(device);
+            Input::Get()->Draw();
 
             Graphics::Get()->EndDraw();
 

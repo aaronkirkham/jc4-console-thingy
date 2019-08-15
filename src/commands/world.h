@@ -19,15 +19,15 @@ class WorldCommand : public ICommand
 
     virtual bool Handler(const std::string& arguments) override
     {
-        static auto World     = *(void**)0x142C7FEF0;
-        static auto WorldTime = *(void**)0x142C4C1A0;
+        static auto hnpkWorld = *(void**)0x142CD6F70;
+        static auto WorldTime = *(void**)0x142CA2DA0;
 
         // time
         if (arguments.find("time ") != std::string::npos) {
             float time = 0.0f;
             if (sscanf_s(arguments.c_str(), "time %f", &time) == 1) {
                 time = std::clamp(time, -24.0f, 24.0f);
-                hk::func_call<void>(0x14031C800, WorldTime, time, 2);
+                hk::func_call<void>(0x14031F7D0, WorldTime, time, 2);
                 return true;
             }
         }
@@ -43,13 +43,13 @@ class WorldCommand : public ICommand
         else if (arguments.find("gravity ") != std::string::npos) {
             float gravity = -9.810f;
             if (sscanf_s(arguments.c_str(), "gravity %f", &gravity) == 1) {
-                *(float*)((char*)World + 0x974) = std::clamp(gravity, -5000.0f, 5000.0f);
+                *(float*)((char*)hnpkWorld + 0x974) = std::clamp(gravity, -5000.0f, 5000.0f);
                 return true;
             }
         }
         // reset gravity
         else if (arguments.find("resetgravity") != std::string::npos) {
-            *(float*)((char*)World + 0x974) = -9.810f;
+            *(float*)((char*)hnpkWorld + 0x974) = -9.810f;
             return true;
         }
 
