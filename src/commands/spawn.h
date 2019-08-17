@@ -266,7 +266,6 @@ class SpawnCommand : public ICommand
         "wpn_080_experimental",
         "wpn_081_experimental",
         "wpn_100_railgun",
-        "wpn_102_crossbow",
         "w206_mounted_capstone_m2hm",
         "wpn_201_minigun",
         "wpn_201_minigun_aoc",
