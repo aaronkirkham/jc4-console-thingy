@@ -6,8 +6,8 @@ class SpawnCommand : public ICommand
 {
   public:
     // clang-format off
-    std::array<const char *, 444> m_Hints = {
-        // VEHICLES
+    std::array<const char *, 523> m_Hints = {
+        // Base game - Land vehicles
         "v000_car_atv_civilian_01",
         "v000_car_atv_javi",
         "v001_car_forklift_industrial",
@@ -22,7 +22,6 @@ class SpawnCommand : public ICommand
         "v004_car_articulatedtruck_commercial_smallmobileweapon_trailer",
         "v005_car_wheelloader_industrial",
         "v006_car_conveyorcrane_industrial",
-        // "v007_car_",
         "v008_car_taxitrike_civilian",
         "v009_car_armoredtruck_commercial_01",
         "v010_car_oldtractor_civilian_01",
@@ -41,7 +40,6 @@ class SpawnCommand : public ICommand
         "v017_car_vintagemuscle_bomb_special",
         "v017_car_vintagemuscle_civilian",
         "v017_car_vintagemuscle_civilian_02",
-        "v017_car_vintagemuscle_rico",
         "v018_car_monstertruck_bomb_special",
         "v018_car_monstertruck_civilian_01",
         "v019_car_modernlimo_bomb_special",
@@ -57,7 +55,6 @@ class SpawnCommand : public ICommand
         "v024_car_ecosuper_bomb_special",
         "v024_car_ecosuper_civilian_01",
         "v024_car_ecosuper_racing_01",
-        "v024_car_ecosuper_preorder_01",  // DLC_NeonRacer. EcoSuper Spoilers are diff. Havent checked speed diff. It comes with Neon, I guess.
         "v025_car_vintagesuper_bomb_special",
         "v025_car_vintagesuper_civilian_01",
         "v026_car_vintagesports_bomb_special",
@@ -65,7 +62,6 @@ class SpawnCommand : public ICommand
         "v027_car_hurricanetruck_civilian",
         "v027_car_hurricanetruck_tesla",
         "v027_car_hurricanetruck_transport",
-        // "v028_car_",
         "v029_car_smallmodernsedan_civilian_01",
         "v029_car_smallmodernsedan_civilian_02",
         "v030_car_oldmini_civilian_01",
@@ -92,25 +88,40 @@ class SpawnCommand : public ICommand
         "v039_car_oldcampervan_civilian_02",
         "v040_car_oldcompact_civilian_01",
         "v040_car_oldcompact_sargento",
-        // "v041_car_",
         "v042_car_racingsedan_civilian",
         "v042_car_racingsedan_racing_01",
-        // "v043_car_",
-        // "v044_car_",
         "v045_car_minetruck_commercial_01",
         "v046_car_racingbuggy_civilian",
         "v046_car_racingbuggy_military",
         "v046_car_racingbuggy_racing_01",
-        "v046_car_racingbuggy_preorder_01", //DLC_DeathStalker. A Weaponised Buggy w/ a Machine Gun on the hood. Personally modified by Rico. Havent checked speeds. I will leave a Screenshot https://imgur.com/78ePUOE
-        // "v047_car_",
-        // "v048_car_",
-        // "v049_car_",
-        "v050_car_toyjeep_civilian",
-        "v084_car_icecreamtruck_garage",
-        "v085_car_explosivetrike_garage",
-        "v117_boat_duck_garage",
+		"v050_car_toyjeep_civilian",
 
-        // boats
+		// Base game - Bikes
+        "v301_bike_combatdirt_military_01",
+        "v301_bike_combatdirt_rebel_01",
+        "v303_bike_modernsuper_bomb_special",
+        "v303_bike_modernsuper_civilian_01",
+        "v304_bike_modernsport_bomb_special",
+        "v304_bike_modernsport_civilian_01",
+        "v305_bike_oldroad_civilian_01",
+        "v306_bike_modernroad_civilian_01",
+        "v307_bike_oldmoped_civilian_01",
+        "v308_bike_trials_civilian_01",
+        "v308_bike_trials_javi",
+
+		// Base game - Treaded
+        "v800_treaded_modernheavytank_military_01",
+        "v800_treaded_modernheavytank_rebel_01",
+        "v801_treaded_mediumtank_military_01",
+        "v801_treaded_mediumtank_rebel_01",
+        "v802_treaded_aatank_military",
+        "v802_treaded_aatank_rebel",
+        "v803_treaded_flexturrettank_military",
+        "v803_treaded_flexturrettank_rebel",
+        "v804_treaded_snowmobile_civilian",
+        "v804_treaded_snowmobile_civilian_mission_special",
+		
+        // Base game - Sea vehicles
         "v100_boat_fanboat_civilian",
         "v101_boat_smalljet_military",
         "v101_boat_smalljet_rebel",
@@ -134,7 +145,7 @@ class SpawnCommand : public ICommand
         "v109_boat_ferry_commercial_garlandintro",
         "v110_boat_jetski_civilian_01",
 
-        // helicopters
+        // Base game - Helicopters
         "v200_helicopter_heavylift_military",
         "v200_helicopter_heavylift_rebel_01",
         "v200_helicopter_heavylift_rebel_mission_special",
@@ -165,21 +176,7 @@ class SpawnCommand : public ICommand
         "v254_helicopter_guarddrone_military",
         "v254_helicopter_guarddrone_rebel",
 
-        // bikes
-        "v301_bike_combatdirt_military_01",
-        "v301_bike_combatdirt_rebel_01",
-        // "v302_bike_",
-        "v303_bike_modernsuper_bomb_special",
-        "v303_bike_modernsuper_civilian_01",
-        "v304_bike_modernsport_bomb_special",
-        "v304_bike_modernsport_civilian_01",
-        "v305_bike_oldroad_civilian_01",
-        "v306_bike_modernroad_civilian_01",
-        "v307_bike_oldmoped_civilian_01",
-        "v308_bike_trials_civilian_01",
-        "v308_bike_trials_javi",
-
-        // planes
+        // Base game - Planes
         "v400_plane_fighterjet_military_01",
         "v400_plane_fighterjet_rebel_01",
         "v401_plane_cargotransport_military_01",
@@ -189,14 +186,19 @@ class SpawnCommand : public ICommand
         "v402_plane_fighterbomber_rebel_01",
         "v403_plane_microjet_military",
         "v403_plane_microjet_rebel",
-        "v403_plane_microjet_preorder_01",  // DLC_DigitalDeluxe. Its a "Black Hand Stealth Micro Jet". Havent checked speed diff.
         "v404_plane_privatejet_civilian",
         "v405_plane_commercialcargo_commercial",
         "v406_plane_smallprop_civilian_01",
         "v407_plane_mediumprop_civilian_01",
         "v408_plane_ultralight_civilian",
 
-        // trains
+		// Base game - Balloon
+        "v700_balloon_dirigible_civilian",
+        "v700_balloon_dirigible_collectible",
+        "v700_balloon_dirigible_military_01",
+        "v700_balloon_dirigible_node_science_01",
+
+        // Base game - Trains
         "v500_train_industrialengine_industrial",
         "v500_train_industrialengine_rebel",
         "v501_train_containercarriage_industrial",
@@ -230,25 +232,7 @@ class SpawnCommand : public ICommand
         "v506_train_armoredhowitzer_rebel",
         "v506_train_armoredhowitzer_decouple_immune",
 
-        // treaded
-        "v800_treaded_modernheavytank_military_01",
-        "v800_treaded_modernheavytank_rebel_01",
-        "v801_treaded_mediumtank_military_01",
-        "v801_treaded_mediumtank_rebel_01",
-        "v802_treaded_aatank_military",
-        "v802_treaded_aatank_rebel",
-        "v803_treaded_flexturrettank_military",
-        "v803_treaded_flexturrettank_rebel",
-        "v804_treaded_snowmobile_civilian",
-        "v804_treaded_snowmobile_civilian_mission_special",
-
-        // balloon
-        "v700_balloon_dirigible_civilian",
-        "v700_balloon_dirigible_collectible",
-        "v700_balloon_dirigible_military_01",
-        "v700_balloon_dirigible_node_science_01",
-
-        // trailers
+        // Base game - Trailers
         "v901_trailer_cartransport_commercial",
         "v902_trailer_lowloader_commerical",
         "v902_trailer_lowloader_mobile_radar_folded",
@@ -258,11 +242,9 @@ class SpawnCommand : public ICommand
         "v903_trailer_cargo_commerical",
         "v904_trailer_smallmobileweapon_military",
         "v904_trailer_smallmobileweapon_rebel",
-        // "v905_trailer_",
-        // "v906_trailer_",
         "v907_trailer_radarjammer_military",
 
-        // WEAPONS
+        // Base game - Weapons
         "wpn_000_assault_rifle",
         "wpn_001_assault_rifle",
         "wpn_003_assault_rifle",
@@ -284,7 +266,6 @@ class SpawnCommand : public ICommand
         "wpn_080_experimental",
         "wpn_081_experimental",
         "wpn_100_railgun",
-        "wpn_102_crossbow",
         "w206_mounted_capstone_m2hm",
         "wpn_201_minigun",
         "wpn_201_minigun_aoc",
@@ -306,15 +287,152 @@ class SpawnCommand : public ICommand
         "wpn_204_mortar_mounted_aoc",
         "illapa_defence_weapon",
         "cow_gun",
-        "wpn_901_signature_rifle",      // DLC_DeathStalker Signature Rifle.Rico's fav.Explosive Assault Rifle, its Love. Is there anything else I can say?
-        "wpn_902_golden_shotgun",      // DLC_GoldenGear Shotgun. A Golden Gear Shotgun featuring Ricochet tracer in secondary fire.
-        "wpn_903_renegade_assault_rifle",    // DLC_Renegade. Bullshark Assault Rifle. A Rifle that spawns Drone. Pretty Cool, right? 
-        "wpn_990_premium_wingsuit_bullet_streamer",
-        "wpn_991_premium_wingsuit_dragon_breath", // DLC_DigitalDeluxe. Both Wingsuits (990,991) dont work.
-        "wpn_905_clusterbomb",
         "the_pan",
 
-        // CHARACTERS
+		//DLC DigitalDeluxe
+		"wpn_990_premium_wingsuit_bullet_streamer",
+        "wpn_991_premium_wingsuit_dragon_breath",
+		"v403_plane_microjet_preorder_01",
+
+		// DLC DeathStalker
+		"v017_car_vintagemuscle_rico",
+		"v046_car_racingbuggy_preorder_01",
+		"wpn_901_signature_rifle",
+
+		// DLC GoldenGear
+        "wpn_902_golden_shotgun",
+
+		// DLC Renegade
+        "wpn_903_renegade_assault_rifle",
+
+		// DLC Neon racer
+		"v024_car_ecosuper_preorder_01",
+
+		// DLC Toy Vehicle pack
+		"v122_boat_toypatrol_garage",
+		"v420_plane_toybomber_garage",
+		"v820_treaded_toytank_garage",
+
+		// DLC Soaring Speed pack
+		"v053_car_hotrod_garage",
+		"v053_car_hotrod_rotrod",
+		"v086_car_flyingcar_garage",
+
+		// DLC Legacy pack
+        "v084_car_icecreamtruck_garage",
+        "v085_car_explosivetrike_garage",
+        "v117_boat_duck_garage",
+		"wpn_905_clusterbomb",
+
+		// DLC Daredevils
+		"v072_car_vintagesuvdlc1_debug",
+		"v072_car_vintagesuvdlc1_level_0",
+		"v072_car_vintagesuvdlc1_level_1",
+		"v072_car_vintagesuvdlc1_level_2",
+		"v072_car_vintagesuvdlc1_level_3",
+
+		"v073_car_luxurysportssedandlc1_debug",
+		"v073_car_luxurysportssedandlc1_level_0",
+		"v073_car_luxurysportssedandlc1_level_1",
+		"v073_car_luxurysportssedandlc1_level_2",
+		"v073_car_luxurysportssedandlc1_level_3",
+
+		"v074_car_ecosuperdlc1_debug",
+		"v074_car_ecosuperdlc1_level_0",
+		"v074_car_ecosuperdlc1_level_1",
+		"v074_car_ecosuperdlc1_level_2",
+		"v074_car_ecosuperdlc1_level_3",
+
+		"v075_car_vintagesuperdlc1_debug",
+		"v075_car_vintagesuperdlc1_level_0",
+		"v075_car_vintagesuperdlc1_level_1",
+		"v075_car_vintagesuperdlc1_level_2",
+		"v075_car_vintagesuperdlc1_level_3",
+
+		"v076_car_racingbuggydlc1_debug",
+		"v076_car_racingbuggydlc1_level_0",
+		"v076_car_racingbuggydlc1_level_1",
+		"v076_car_racingbuggydlc1_level_2",
+		"v076_car_racingbuggydlc1_level_3",
+
+		"v077_car_offroadracingsedandlc1_debug",
+		"v077_car_offroadracingsedandlc1_level_0",
+		"v077_car_offroadracingsedandlc1_level_1",
+		"v077_car_offroadracingsedandlc1_level_2",
+		"v077_car_offroadracingsedandlc1_level_3",
+
+		"v078_car_monstertruckdlc1_debug",
+		"v078_car_monstertruckdlc1_level_0",
+		"v078_car_monstertruckdlc1_level_1",
+		"v078_car_monstertruckdlc1_level_2",
+		"v078_car_monstertruckdlc1_level_3",
+
+		"v051_car_battlemuscle_allgold_level_3",
+		"v051_car_battlemuscle_collectible_level_3",
+		"v051_car_battlemuscle_daredevil",
+		"v051_car_battlemuscle_level_0",
+		"v051_car_battlemuscle_metal01",
+		"v051_car_battlemuscle_rust01",
+		"v051_car_battlemuscle_stripe01",
+		"v051_car_battlemuscle_tiger01",
+
+		"v051_car_battlemuscle_deathraceace_level_1",
+		"v051_car_battlemuscle_deathraceace_level_2",
+		"v051_car_battlemuscle_deathraceace_level_3",
+
+		"v051_car_battlemuscle_intro_level_1",
+		"v051_car_battlemuscle_intro_level_2",
+		"v051_car_battlemuscle_intro_level_3",
+
+		"v051_car_battlemuscle_outro_level_1",
+		"v051_car_battlemuscle_outro_level_2",
+		"v051_car_battlemuscle_outro_level_3",
+
+		"v051_car_battlemuscle_rampagerallyace_level_1",
+		"v051_car_battlemuscle_rampagerallyace_level_2",
+		"v051_car_battlemuscle_rampagerallyace_level_3",
+
+		"v051_car_battlemuscle_survivalraceace_level_1",
+		"v051_car_battlemuscle_survivalraceace_level_2",
+		"v051_car_battlemuscle_survivalraceace_level_3",
+
+		// DLC Demons
+		"wpn_102_crossbow",
+		"wpn_808_combat_rifle_seed_gun",
+
+		"dlc2_substrate_weapon_aa_gun_01",
+		"dlc2_substrate_weapon_aa_tank_01",
+		"dlc2_substrate_weapon_apc_01",
+		"dlc2_substrate_weapon_cannon_truck_01",
+		"dlc2_substrate_weapon_heli_light_01",
+		"dlc2_substrate_weapon_modern_tank_01",
+		"dlc2_substrate_weapon_mortar_01",
+
+		"dlc2_substrate_weapon_aa_gun_01_outro",
+		"dlc2_substrate_weapon_aa_tank_01_outro",
+		"dlc2_substrate_weapon_apc_01_outro",
+		"dlc2_substrate_weapon_cannon_truck_01_outro",
+		"dlc2_substrate_weapon_modern_tank_01_outro",
+		"dlc2_substrate_weapon_mortar_01_outro",
+
+		"demon",
+
+        // Base game - Characters
+		"private_enemy_001",
+        "private_enemy_002",
+		"elite_enemy_001",
+		"elite_paratrooper",
+		"super_elite_enemy_001",
+		"titan_enemy_001",
+
+        "ghost_enemy_001",
+        "grenadier_enemy_001",
+        "machinegunner_enemy_001",
+        "rpg_enemy_001",
+        "shielder_enemy_001",
+        "sniper_enemy_001",
+
+		// Base game - Animals
         "cow",
         "bull",
         "deer_doe",
@@ -330,6 +448,8 @@ class SpawnCommand : public ICommand
         "domestic_pig",
         "feral_hog",
         "wild_boar",
+
+		// Base game - Characters
         "civ_alpine_scientist_female",
         "civ_alpine_scientist_male",
         "civ_scientist_female",
@@ -415,18 +535,8 @@ class SpawnCommand : public ICommand
         "civ_graffitiartist_male_01",
         "civ_street_musician_female_01",
         "civ_street_musician_male_01",
-        "elite_enemy_001",
-        "ghost_enemy_001",
-        "grenadier_enemy_001",
-        "machinegunner_enemy_001",
-        "elite_paratrooper",
-        "private_enemy_001",
-        "private_enemy_002",
-        "rpg_enemy_001",
-        "shielder_enemy_001",
-        "sniper_enemy_001",
-        "super_elite_enemy_001",
-        "titan_enemy_001",
+
+		// Base game - Rebels
         "sargentos_rebel_female_01",
         "sargentos_rebel_female_02",
         "sargentos_rebel_female_03",
@@ -468,6 +578,8 @@ class SpawnCommand : public ICommand
         "male_rebel_tier_3_02",
         "male_rebel_tier_3_03",
         "male_rebel_tier_3_04",
+
+		// Base game - Main characters
         "civ_female_aha_dancer_follower",
         "cesar",
         "dictator",
