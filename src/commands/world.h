@@ -5,13 +5,6 @@
 class WorldCommand : public ICommand
 {
   public:
-    std::array<const char*, 4> m_Hints = {
-        "time",
-        "timescale",
-        "gravity",
-        "resetgravity",
-    };
-
     virtual const char* GetCommand() override
     {
         return "world";
@@ -58,8 +51,15 @@ class WorldCommand : public ICommand
 
     virtual std::vector<std::string> GetHints(const std::string& arguments) override
     {
+        static std::array hints{
+            "time",
+            "timescale",
+            "gravity",
+            "resetgravity",
+        };
+
         std::vector<std::string> result;
-        std::copy_if(m_Hints.begin(), m_Hints.end(), std::back_inserter(result),
+        std::copy_if(hints.begin(), hints.end(), std::back_inserter(result),
                      [&](const std::string& item) { return item.find(arguments) != std::string::npos; });
 
         return result;
