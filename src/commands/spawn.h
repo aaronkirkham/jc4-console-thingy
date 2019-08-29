@@ -341,7 +341,7 @@ class SpawnCommand : public ICommand
 
             // DLC Soaring Speed pack
             "v053_car_hotrod_garage",
-            "v053_car_hotrod_rotrod",
+            "v053_car_hotrod_ratrod",
             "v086_car_flyingcar_garage",
 
             // DLC Legacy pack
