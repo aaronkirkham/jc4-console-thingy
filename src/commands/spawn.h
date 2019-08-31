@@ -351,7 +351,8 @@ class SpawnCommand : public ICommand
             "wpn_905_clusterbomb",
 			
 			// DLC Adversary pack
-			// TODO Get adversary pack
+			"v422_plane_vtoljet_garage",
+			"v081_car_interceptor_garage",
 
             // DLC Daredevils
             "v072_car_vintagesuvdlc1_debug",
