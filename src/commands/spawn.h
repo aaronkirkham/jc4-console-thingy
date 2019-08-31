@@ -352,7 +352,7 @@ class SpawnCommand : public ICommand
 			
 			// DLC Adversary pack
 			"v422_plane_vtoljet_garage",
-			"v081_car_interceptor_garage",
+			"v081_car_interceptor",
 
             // DLC Daredevils
             "v072_car_vintagesuvdlc1_debug",
