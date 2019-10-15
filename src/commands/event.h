@@ -16,7 +16,7 @@ class EventCommand : public ICommand
             return false;
         }
 
-        hk::func_call<void>(0x1446EB790, arguments.c_str(), nullptr);
+        hk::func_call<void>(0x147BFEB20, arguments.c_str(), nullptr);
         return true;
     }
 

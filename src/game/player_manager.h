@@ -10,7 +10,7 @@ class CPlayerManager
   public:
     static CPlayerManager& instance()
     {
-        return **(CPlayerManager**)0x142CA5378;
+        return **(CPlayerManager**)0x142CB2388;
     }
 
     static CCharacter* GetLocalPlayerCharacter()
