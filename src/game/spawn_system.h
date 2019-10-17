@@ -14,7 +14,7 @@ class CSpawnSystem
   public:
     static CSpawnSystem& instance()
     {
-        return **(CSpawnSystem**)0x142CA4D10;
+        return **(CSpawnSystem**)0x142CB1D20;
     }
 
     void Spawn(const std::string& model_name, const CMatrix4f& transform,
@@ -29,22 +29,21 @@ class CSpawnSystem
         };
 
         auto request = new SpawnReq{callback, userdata};
-        hk::func_call<void>(
-            0x140BA62E0, this, model_name.c_str(), transform, 0x597Cu,
-            (success_t)[](const spawned_objects& objects, void* userdata) {
-                auto spawn_req = (SpawnReq*)userdata;
-                spawn_req->callback(objects, spawn_req->userdata);
-                delete spawn_req;
-            },
-            request,
-            (status_t)[](int32_t status, void* userdata) {
-                // resource failed to load
-                if (status == 16) {
-                    auto spawn_req = (SpawnReq*)userdata;
-                    delete spawn_req;
-                }
-            },
-            0, -1);
+        hk::func_call<void>(0x140BADC60, this, model_name.c_str(), transform, 0x597Cu,
+                            (success_t)[](const spawned_objects& objects, void* userdata) {
+                                auto spawn_req = (SpawnReq*)userdata;
+                                spawn_req->callback(objects, spawn_req->userdata);
+                                delete spawn_req;
+                            },
+                            request,
+                            (status_t)[](int32_t status, void* userdata) {
+                                // resource failed to load
+                                if (status == 16) {
+                                    auto spawn_req = (SpawnReq*)userdata;
+                                    delete spawn_req;
+                                }
+                            },
+                            0, -1);
     }
 };
 } // namespace jc

@@ -12,15 +12,15 @@ class WorldCommand : public ICommand
 
     virtual bool Handler(const std::string& arguments) override
     {
-        static auto hnpkWorld = *(void**)0x142CD6F70;
-        static auto WorldTime = *(void**)0x142CA2DA0;
+        static auto hnpkWorld = *(void**)0x142CE3F30;
+        static auto WorldTime = *(void**)0x142CAFDB0;
 
         // time
         if (arguments.find("time ") != std::string::npos) {
             float time = 0.0f;
             if (sscanf_s(arguments.c_str(), "time %f", &time) == 1) {
                 time = std::clamp(time, -24.0f, 24.0f);
-                hk::func_call<void>(0x14031F7D0, WorldTime, time, 2);
+                hk::func_call<void>(0x140322720, WorldTime, time, 2);
                 return true;
             }
         }

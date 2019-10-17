@@ -173,14 +173,16 @@ class SpawnCommand : public ICommand
 
             // Base game - Helicopters
             "v200_helicopter_heavylift_military",
+            "v200_helicopter_heavylift_military_chaos_sphere_tank",
+            "v200_helicopter_heavylift_military_quest_special",
             "v200_helicopter_heavylift_rebel_01",
             "v200_helicopter_heavylift_rebel_mission_special",
-            "v200_helicopter_heavytroop_mira",
             "v201_helicopter_mediumattack_military_01",
             "v201_helicopter_mediumattack_rebel_01",
-            "v202_helicopter_lightheavytroop_gabriela",
-            "v202_helicopter_lightheavytroop_military_01",
-            "v202_helicopter_lightheavytroop_rebel_01",
+            "v202_helicopter_heavytroop_gabriela",
+            "v202_helicopter_heavytroop_military_01",
+            "v202_helicopter_heavytroop_mira",
+            "v202_helicopter_heavytroop_rebel_01",
             "v203_helicopter_lightattack_military_01",
             "v203_helicopter_lightattack_rebel_01",
             "v204_helicopter_heavyassault_military_01",
@@ -190,6 +192,7 @@ class SpawnCommand : public ICommand
             "v205_helicopter_utility_garland",
             "v206_helicopter_bubblescout_civilian_01",
             "v206_helicopter_bubblescout_javi",
+            "v250_helicopter_mediumattackdrone_lead_military",
             "v250_helicopter_mediumattackdrone_military",
             "v250_helicopter_mediumattackdrone_rebel",
             "v250_helicopter_mediumattackdrone_tornado",
@@ -201,6 +204,8 @@ class SpawnCommand : public ICommand
             "v253_helicopter_decoydrone_rebel",
             "v254_helicopter_guarddrone_military",
             "v254_helicopter_guarddrone_rebel",
+            "v270_helicopter_agencydrone_debug",
+            "v270_helicopter_agencydrone_rebel",
 
             // Base game - Planes
             "v400_plane_fighterjet_military_01",
@@ -353,6 +358,10 @@ class SpawnCommand : public ICommand
 			// DLC Adversary pack
 			"v422_plane_vtoljet_garage",
 			"v081_car_interceptor",
+
+			// DLC Sea Dogs pack
+            "v080_car_galleonfloat_garage",
+            "v850_car_hovercraft_armored_garage",
 
             // DLC Daredevils
             "v072_car_vintagesuvdlc1_debug",
