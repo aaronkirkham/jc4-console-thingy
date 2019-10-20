@@ -363,6 +363,10 @@ class SpawnCommand : public ICommand
             "v080_car_galleonfloat_garage",
             "v850_car_hovercraft_armored_garage",
 
+			// DLC Shark & Bark pack
+			"v082_car_shark_garage",
+            "v083_car_dog_garage",
+
             // DLC Daredevils
             "v072_car_vintagesuvdlc1_debug",
             "v072_car_vintagesuvdlc1_level_0",
