@@ -55,7 +55,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
                                       [](const std::string &arguments) { TerminateProcess(GetCurrentProcess(), -1); });
 #endif
 
+#ifdef DEBUG
+        bool quick_start = true;
+#else
         bool quick_start = (strstr(GetCommandLine(), "-quickstart") != nullptr);
+#endif
 
         // enable quick start
         if (quick_start) {
