@@ -12,7 +12,7 @@
 #include "game/render_engine.h"
 #include "game/ui_manager.h"
 
-static constexpr int32_t NUM_HINTS_PER_PAGE = 10;
+static constexpr int32_t NUM_HINTS_PER_PAGE = 20;
 static constexpr float   HINT_ITEM_HEIGHT   = 0.02f;
 static constexpr float   FONT_SIZE_INPUT    = 0.0155f;
 static constexpr float   FONT_SIZE_HINT     = 0.0133f;
