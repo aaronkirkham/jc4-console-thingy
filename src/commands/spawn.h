@@ -354,17 +354,17 @@ class SpawnCommand : public ICommand
             "v085_car_explosivetrike_garage",
             "v117_boat_duck_garage",
             "wpn_905_clusterbomb",
-			
-			// DLC Adversary pack
-			"v422_plane_vtoljet_garage",
-			"v081_car_interceptor",
+            
+            // DLC Adversary pack
+            "v422_plane_vtoljet_garage",
+            "v081_car_interceptor",
 
-			// DLC Sea Dogs pack
+            // DLC Sea Dogs pack
             "v080_car_galleonfloat_garage",
             "v850_car_hovercraft_armored_garage",
 
-			// DLC Shark & Bark pack
-			"v082_car_shark_garage",
+            // DLC Shark & Bark pack
+            "v082_car_shark_garage",
             "v083_car_dog_garage",
 
             // DLC Daredevils
@@ -459,42 +459,42 @@ class SpawnCommand : public ICommand
             "dlc2_substrate_weapon_mortar_01_outro",
 
             "demon",
-			
-			// DLC Danger
-			"v002_car_vintagesuv_rebel_mission_special_dlc3_intro",
-			"v851_car_hovercraft_agency",
-			"v851_car_hovercraft_agency_mission_special_dlc3_outro",
-			"v123_boat_agencyspy_agency",
-			"v221_helicopter_agencyspy_agency",
-			"v270_helicopter_agencydrone_agency",
-			"v270_helicopter_agencydrone_rebel",
-			"v908_trailer_agencysmallmobileweapon",
-			
-			"wpn_100_railgun_miller",
-			"wpn_205_agency_aa_gun",
-			"wpn_450_agency_handcannon",
-			"wpn_460_agency_smg",
-			"wpn_461_agency_sniper",
-			"wpn_463_magnesis",
-			
-			"agent_miller",
-			"sheldon_dlc3",
-			"agency_footsoldier_enemy_female_001",
-			"agency_footsoldier_enemy_male_001",
-			"agency_sniper_enemy_female_001",
-			"agency_sniper_enemy_male_001",
-			"agency_agent_enemy_female_001",
-			"agency_agent_enemy_male_001",
-			"agency_agent_enemy_vip_female01",
-			"agency_agent_enemy_vip_female02",
-			"agency_agent_enemy_vip_female03",
-			"agency_agent_enemy_vip_male01",
-			"agency_agent_enemy_vip_male02",
-			"agency_agent_enemy_vip_male03",
-			"agency_agent_enemy_vip_titan01",
-			
-			"agency_cargo_missile",
-			"dlc3_water_mine",
+            
+            // DLC Danger
+            "v002_car_vintagesuv_rebel_mission_special_dlc3_intro",
+            "v851_car_hovercraft_agency",
+            "v851_car_hovercraft_agency_mission_special_dlc3_outro",
+            "v123_boat_agencyspy_agency",
+            "v221_helicopter_agencyspy_agency",
+            "v270_helicopter_agencydrone_agency",
+            "v270_helicopter_agencydrone_rebel",
+            "v908_trailer_agencysmallmobileweapon",
+            
+            "wpn_100_railgun_miller",
+            "wpn_205_agency_aa_gun",
+            "wpn_450_agency_handcannon",
+            "wpn_460_agency_smg",
+            "wpn_461_agency_sniper",
+            "wpn_463_magnesis",
+            
+            "agent_miller",
+            "sheldon_dlc3",
+            "agency_footsoldier_enemy_female_001",
+            "agency_footsoldier_enemy_male_001",
+            "agency_sniper_enemy_female_001",
+            "agency_sniper_enemy_male_001",
+            "agency_agent_enemy_female_001",
+            "agency_agent_enemy_male_001",
+            "agency_agent_enemy_vip_female01",
+            "agency_agent_enemy_vip_female02",
+            "agency_agent_enemy_vip_female03",
+            "agency_agent_enemy_vip_male01",
+            "agency_agent_enemy_vip_male02",
+            "agency_agent_enemy_vip_male03",
+            "agency_agent_enemy_vip_titan01",
+            
+            "agency_cargo_missile",
+            "dlc3_water_mine",
 
             // Base game - Characters
             "private_enemy_001",
