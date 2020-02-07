@@ -117,8 +117,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             PlayerManagerUpdate.call(_this, dt);
             jc::SkinChangeRequestHandler::Get()->Update();
         });
-    } else if (fdwReason == DLL_PROCESS_DETACH) {
-        Graphics::Get()->Shutdown();
     }
 
     return TRUE;

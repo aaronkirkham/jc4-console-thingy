@@ -1,7 +1,6 @@
 #pragma once
 
 #include "command.h"
-#include "hashlittle.h"
 
 class SkinCommand : public ICommand
 {
@@ -13,11 +12,6 @@ class SkinCommand : public ICommand
 
     virtual bool Handler(const std::string& arguments) override
     {
-        /*if (arguments == "rico_debug" || arguments == "rico_preview_debug" || arguments == "rico_cow_skin"
-            || arguments == "rico_cow_skin_debug") {
-            return false;
-        }*/
-
         std::vector<jc::CSpawnSystem::SResourceDef*, jc::allocator<jc::CSpawnSystem::SResourceDef*>> resources;
         if (jc::CSpawnSystem::instance().GetMatchingResources(arguments, &resources)) {
             jc::CPlayerManager::instance().GetLocalPlayerCharacter()->ChangeSkin(resources[0]->m_resourcePath);

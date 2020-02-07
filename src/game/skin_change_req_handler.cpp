@@ -231,6 +231,8 @@ void SkinChangeRequestHandler::Update()
             character->ChangeSkin(resources[0]->m_resourcePath, [] {
                 last_change = std::chrono::system_clock::now() + std::chrono::milliseconds(500);
             });
+        } else {
+            OutputDebugStringA(" - NO MATCHING RESOURCES.\n");
         }
     }
 #endif

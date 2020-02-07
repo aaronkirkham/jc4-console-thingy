@@ -39,7 +39,7 @@ class Graphics : public Singleton<Graphics>
             IFW1Factory* factory = nullptr;
             auto         hr      = FW1CreateFactory(FW1_VERSION, &factory);
 
-            if (SUCCEEDED(hr) && factory) {
+            if (SUCCEEDED(hr)) {
                 FW1_FONTWRAPPERCREATEPARAMS createParams{};
                 createParams.GlyphSheetWidth                 = 512;
                 createParams.GlyphSheetHeight                = 512;
@@ -57,7 +57,6 @@ class Graphics : public Singleton<Graphics>
                 createParams.DefaultFontParams.pszLocale     = L"";
 
                 hr = factory->CreateFontWrapper(device->m_device, nullptr, &createParams, &m_font);
-
                 if (SUCCEEDED(hr)) {
                     m_ready  = true;
                     m_device = device;
