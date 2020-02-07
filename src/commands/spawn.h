@@ -18,7 +18,7 @@ class SpawnCommand : public ICommand
         }
 
         auto  local_player = jc::CPlayerManager::instance().m_localPlayer;
-        auto  transform    = local_player->m_character->m_transform;
+        auto  transform    = local_player->m_character->m_worldTransform;
         auto &aimpos       = local_player->m_aimControl->m_aimPos;
 
         transform.m[3].x = aimpos.x;
@@ -354,7 +354,7 @@ class SpawnCommand : public ICommand
             "v085_car_explosivetrike_garage",
             "v117_boat_duck_garage",
             "wpn_905_clusterbomb",
-            
+
             // DLC Adversary pack
             "v422_plane_vtoljet_garage",
             "v081_car_interceptor",
@@ -459,7 +459,7 @@ class SpawnCommand : public ICommand
             "dlc2_substrate_weapon_mortar_01_outro",
 
             "demon",
-            
+
             // DLC Danger
             "v002_car_vintagesuv_rebel_mission_special_dlc3_intro",
             "v851_car_hovercraft_agency",
@@ -469,14 +469,14 @@ class SpawnCommand : public ICommand
             "v270_helicopter_agencydrone_agency",
             "v270_helicopter_agencydrone_rebel",
             "v908_trailer_agencysmallmobileweapon",
-            
+
             "wpn_100_railgun_miller",
             "wpn_205_agency_aa_gun",
             "wpn_450_agency_handcannon",
             "wpn_460_agency_smg",
             "wpn_461_agency_sniper",
             "wpn_463_magnesis",
-            
+
             "agent_miller",
             "sheldon_dlc3",
             "agency_footsoldier_enemy_female_001",
@@ -492,7 +492,7 @@ class SpawnCommand : public ICommand
             "agency_agent_enemy_vip_male02",
             "agency_agent_enemy_vip_male03",
             "agency_agent_enemy_vip_titan01",
-            
+
             "agency_cargo_missile",
             "dlc3_water_mine",
 
@@ -503,7 +503,6 @@ class SpawnCommand : public ICommand
             "elite_paratrooper",
             "super_elite_enemy_001",
             "titan_enemy_001",
-
             "ghost_enemy_001",
             "grenadier_enemy_001",
             "machinegunner_enemy_001",
@@ -582,8 +581,8 @@ class SpawnCommand : public ICommand
             "civ_desert_male_01",
             "civ_grasslands_female_01",
             "civ_grasslands_male_01",
-            "civ_business_female_01",
-            "civ_business_male_01",
+            "civ_business_female_001",
+            "civ_business_male_001",
             "civ_vagrant_female_001",
             "civ_vagrant_male_001",
             "civ_athletic_female_001",

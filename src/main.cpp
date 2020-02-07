@@ -14,7 +14,10 @@
 #include "game/player_manager.h"
 #include "game/spawn_system.h"
 
+#include "game/skin_change_req_handler.h"
+
 #include "commands/event.h"
+#include "commands/skin.h"
 #include "commands/spawn.h"
 #include "commands/world.h"
 
@@ -50,6 +53,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         Input::Get()->RegisterCommand(std::make_unique<EventCommand>());
         Input::Get()->RegisterCommand(std::make_unique<SpawnCommand>());
         Input::Get()->RegisterCommand(std::make_unique<WorldCommand>());
+        Input::Get()->RegisterCommand(std::make_unique<SkinCommand>());
 #ifdef DEBUG
         Input::Get()->RegisterCommand("exit",
                                       [](const std::string &arguments) { TerminateProcess(GetCurrentProcess(), -1); });
@@ -73,8 +77,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             hk::put<uint32_t>(0x140E93530, 0x90C301B0);
         }
 
-        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140C7FB50);
-        wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
+        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> WndProc(0x140C7FB50);
+        WndProc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
             auto game_state   = *(uint32_t *)0x142CB8F24;
             auto suspend_game = *(bool *)0x142CBDAF0;
             auto clock        = &jc::Base::CClock::instance();
@@ -92,11 +96,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
                 }
             }
 
-            return wndproc.call(hwnd, uMsg, wParam, lParam);
+            return WndProc.call(hwnd, uMsg, wParam, lParam);
         });
 
-        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140FA2C70);
-        flip.inject([](jc::HDevice_t *device) -> void {
+        static hk::inject_jump<void, jc::HDevice_t *> FlipThread(0x140FA2C70);
+        FlipThread.inject([](jc::HDevice_t *device) -> void {
             Graphics::Get()->BeginDraw(device);
 
             // draw input
@@ -104,7 +108,14 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
             Graphics::Get()->EndDraw();
 
-            flip.call(device);
+            FlipThread.call(device);
+        });
+
+        // CPlayerManager::Update
+        static hk::inject_jump<void, void *, float> PlayerManagerUpdate(0x140B35860);
+        PlayerManagerUpdate.inject([](void *_this, float dt) {
+            PlayerManagerUpdate.call(_this, dt);
+            jc::SkinChangeRequestHandler::Get()->Update();
         });
     } else if (fdwReason == DLL_PROCESS_DETACH) {
         Graphics::Get()->Shutdown();

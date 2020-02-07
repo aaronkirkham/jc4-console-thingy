@@ -2,6 +2,7 @@ workspace "jc4-console-thing"
   configurations { "Debug", "Release" }
   location "out"
   systemversion "latest"
+  toolset "v141"
   language "C++"
   targetdir "out/%{cfg.buildcfg}"
   objdir "out"
