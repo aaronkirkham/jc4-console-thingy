@@ -1,5 +1,6 @@
 #include "skin_change_req_handler.h"
 
+#include "allocator.h"
 #include "character.h"
 #include "spawn_system.h"
 
@@ -17,7 +18,7 @@ SkinChangeRequestHandler::SkinChangeRequestHandler()
 {
     static std::once_flag _once;
     std::call_once(_once, [&] {
-        m_provider = (CEntityProvider *)hk::func_call<void *>(0x140A51DC0, sizeof(CEntityProvider)); // operator new()
+        m_provider = (CEntityProvider *)jc::_alloc(sizeof(CEntityProvider));
         hk::func_call<void>(0x14025F860, m_provider); // CEntityProvider::CEntityProvider
 
         // setup
@@ -492,8 +493,8 @@ void SkeletonLookup::Make(CModelRenderBlock *render_block)
     assert(skeleton_lookup);
     assert(lookup_size > 0);
 
-    // operator new[]
-    auto mapped_skeleton_lookup = hk::func_call<int16_t *>(0x140A51DC0, (lookup_size * sizeof(int16_t)));
+    // copy to new skeleton lookup
+    auto mapped_skeleton_lookup = (int16_t *)jc::_alloc(lookup_size * sizeof(int16_t));
     assert(mapped_skeleton_lookup);
     memcpy(mapped_skeleton_lookup, skeleton_lookup, (lookup_size * sizeof(int16_t)));
 
@@ -532,7 +533,7 @@ void SkeletonLookup::Empty()
     m_rbiInstances.clear();
 
     for (auto &&lookup : m_skeletonLookup) {
-        hk::func_call<void>(0x141AF8E1C, lookup.second); // operator delete[]
+        jc::_free(lookup.second);
         lookup.second = nullptr;
     }
 
