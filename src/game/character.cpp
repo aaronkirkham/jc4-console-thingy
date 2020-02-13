@@ -25,10 +25,14 @@ static void DumpBoneMap(void* skin_swapper)
 
 namespace jc
 {
+static uint32_t HASH_CLASS_HASH = "_class_hash"_hash_little;
+static uint32_t HASH_CCHARACTER = "CCharacter"_hash_little;
+static uint32_t HASH_MODEL      = "model"_hash_little;
+static uint32_t HASH_SKELETON   = "skeleton"_hash_little;
+static uint32_t HASH_FILEPATH   = "filepath"_hash_little;
+
 static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* container)
 {
-    static uint32_t _class_hash = "_class_hash"_hash_little;
-
     SPartialModelState* model_state    = &character->m_modelState;
     CAnimatedModel*     animated_model = &character->m_animatedModel;
 
@@ -36,66 +40,68 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
         return;
     }
 
-    uint32_t model_hash    = 0;
-    uint32_t skeleton_hash = 0;
+    uint32_t                           skeleton_hash = 0;
+    std::vector<std::vector<uint32_t>> model_infos;
 
+    // get all model info from runtime container
     CRuntimeContainer rc{container->m_base};
     for (auto cont_ptr = container->begin(); cont_ptr != container->end(); ++cont_ptr) {
         rc.m_container = cont_ptr;
 
-        if (rc.GetHash(_class_hash) == "CCharacter"_hash_little) {
-            model_hash    = rc.GetHash("model"_hash_little);
-            skeleton_hash = rc.GetHash("skeleton"_hash_little);
+        if (rc.GetHash(HASH_CLASS_HASH) == HASH_CCHARACTER) {
+            auto model_hash = rc.GetHash(HASH_MODEL);
+            skeleton_hash   = rc.GetHash(HASH_SKELETON);
 
-            // probably using parts..
+            // model uses parts!
             if (model_hash == 0) {
-                int32_t count =
-                    hk::func_call<int32_t>(0x1402A6CA0, &rc, 0xC160E555); // CGameObjectUtil::CountSubComponents
+                // CGameObjectUtil::CountSubComponents
+                int32_t count = hk::func_call<int32_t>(0x1402A6CA0, &rc, 0xC160E555);
+                model_infos.resize(count);
 
-                std::vector<std::vector<std::pair<uint32_t, float>>> model_infos(count);
-                uint8_t                                              slot = 0;
+                uint32_t current_info_slot = 0;
 
                 CRuntimeContainer sub_rc{rc.m_base};
                 for (auto a = rc.begin(); a != rc.end(); ++a) {
                     sub_rc.m_container = a;
 
-                    if (sub_rc.GetHash(_class_hash) == 0xC160E555) { // some model container
+                    // model container
+                    if (sub_rc.GetHash(HASH_CLASS_HASH) == 0xC160E555) {
                         CRuntimeContainer sub_sub_rc{sub_rc.m_base};
+
                         for (auto b = sub_rc.begin(); b != sub_rc.end(); ++b) {
                             sub_sub_rc.m_container = b;
 
-                            if (sub_sub_rc.GetHash(_class_hash) == 0xAA09A7DC) { // model
-                                model_hash   = sub_sub_rc.GetHash("filepath"_hash_little);
-                                float weight = sub_sub_rc.GetFloat("Weight"_hash_little);
-
-                                model_infos[slot].push_back({model_hash, weight});
+                            // model entry
+                            if (sub_sub_rc.GetHash(HASH_CLASS_HASH) == 0xAA09A7DC) {
+                                model_hash = sub_sub_rc.GetHash(HASH_FILEPATH);
+                                model_infos[current_info_slot].push_back(model_hash);
                                 break;
                             }
                         }
 
-                        ++slot;
+                        ++current_info_slot;
                     }
                 }
-
-                // @TODO: need to add tint stuff, so we don't have mismatched model parts!
-                model_state->Reset();
-                for (const auto& info : model_infos) {
-                    if (info.empty()) {
-                        continue;
-                    }
-
-                    model_state->SetModel(model_state->m_modelCount, info[0].first, character->m_worldTransform,
-                                          &animated_model->m_animationController->m_skinningPalette);
-                }
-
-                // @CRASHFIX: make sure this doesn't crash the game.
-                // hk::func_call<void>(0x1485D0300, ((char*)character + 0x10), 0.5f); // CCharacter::SetOpacity
             } else {
-                model_state->Reset();
-                model_state->SetModel(0, model_hash, character->m_worldTransform,
-                                      &animated_model->m_animationController->m_skinningPalette);
+                model_infos.resize(1);
+                model_infos[0].push_back(model_hash);
             }
+
             break;
+        }
+    }
+
+    // set model data from model info
+    if (!model_infos.empty()) {
+        model_state->Reset();
+
+        for (const auto& info : model_infos) {
+            if (info.empty()) {
+                continue;
+            }
+
+            model_state->SetModel(model_state->m_modelCount, info[0], character->m_worldTransform,
+                                  &animated_model->m_animationController->m_skinningPalette);
         }
     }
 
@@ -110,6 +116,8 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
                                        });
 #endif
 
+    // @TODO: we want to do this, but not before the new skeleton is mapped,
+    //		  otherwise we get an ugly flash of the model in T pose.
     SkeletonLookup::Get()->Empty();
 
     // rico skeleton		= 0xec0124bc (animations/skeletons/characters/rico.bsk)
