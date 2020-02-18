@@ -23,7 +23,6 @@ class EventCommand : public ICommand
     virtual std::vector<std::string> GetHints(const std::string& arguments) override
     {
         static std::array hints{
-            "__showfps",
             "__reload_world",
             "ply.invulnerable",
             "ply.vulnerable",

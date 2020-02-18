@@ -11,6 +11,7 @@
 #include "game/debug_renderer_impl.h"
 #include "game/device.h"
 #include "game/game_object.h"
+#include "game/game_world.h"
 #include "game/player_manager.h"
 #include "game/spawn_system.h"
 
@@ -19,6 +20,7 @@
 #include "commands/event.h"
 #include "commands/skin.h"
 #include "commands/spawn.h"
+#include "commands/teleport.h"
 #include "commands/world.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
@@ -54,6 +56,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         Input::Get()->RegisterCommand(std::make_unique<SpawnCommand>());
         Input::Get()->RegisterCommand(std::make_unique<WorldCommand>());
         Input::Get()->RegisterCommand(std::make_unique<SkinCommand>());
+        Input::Get()->RegisterCommand(std::make_unique<TeleportCommand>());
 #ifdef DEBUG
         Input::Get()->RegisterCommand("exit",
                                       [](const std::string &arguments) { TerminateProcess(GetCurrentProcess(), -1); });

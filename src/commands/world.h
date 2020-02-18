@@ -15,6 +15,8 @@ class WorldCommand : public ICommand
         static auto hnpkWorld = *(void**)0x142CE3F30;
         static auto WorldTime = *(void**)0x142CAFDB0;
 
+        static constexpr float DEFAULT_GRAVITY = -9.810f;
+
         // time
         if (arguments.find("time ") != std::string::npos) {
             float time = 0.0f;
@@ -34,7 +36,7 @@ class WorldCommand : public ICommand
         }
         // gravity
         else if (arguments.find("gravity ") != std::string::npos) {
-            float gravity = -9.810f;
+            float gravity = DEFAULT_GRAVITY;
             if (sscanf_s(arguments.c_str(), "gravity %f", &gravity) == 1) {
                 *(float*)((char*)hnpkWorld + 0x974) = std::clamp(gravity, -5000.0f, 5000.0f);
                 return true;
@@ -42,7 +44,7 @@ class WorldCommand : public ICommand
         }
         // reset gravity
         else if (arguments.find("resetgravity") != std::string::npos) {
-            *(float*)((char*)hnpkWorld + 0x974) = -9.810f;
+            *(float*)((char*)hnpkWorld + 0x974) = DEFAULT_GRAVITY;
             return true;
         }
 
