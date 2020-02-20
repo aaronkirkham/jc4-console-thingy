@@ -28,16 +28,42 @@ class TeleportCommand : public ICommand
 
             return true;
         } else {
-            CVector3f position{};
-            if (sscanf_s(arguments.c_str(), "%f %f %f", &position.x, &position.y, &position.z) == 3) {
-                CMatrix4f world{};
-                world.m[3].x = position.x;
-                world.m[3].y = position.y;
-                world.m[3].z = position.z;
+            static auto teleport = [](const std::string& str) {
+                CVector3f position{};
+                if (sscanf_s(str.c_str(), "%f %f %f", &position.x, &position.y, &position.z) == 3) {
+                    CMatrix4f world{};
+                    world.m[3].x = position.x;
+                    world.m[3].y = position.y;
+                    world.m[3].z = position.z;
 
-                jc::CGameWorld::instance().TeleportPlayer(&world, nullptr, false, false, 0.0f, 0.0f, 0, nullptr, false,
-                                                          nullptr);
+                    jc::CGameWorld::instance().TeleportPlayer(&world, nullptr, false, false, 0.0f, 0.0f, 0, nullptr,
+                                                              false, nullptr);
+                    return true;
+                }
+
+                return false;
+            };
+
+            // try read coords straight from input (e.g. tp [x] [y] [z])
+            if (teleport(arguments)) {
                 return true;
+            }
+            // read saved position from coords file
+            else {
+                char name[128] = {0};
+                if (sscanf_s(arguments.c_str(), "%[^\n]s", &name, 128) == 1) {
+                    std::ifstream infile("savedcoords.txt");
+                    std::string   line;
+
+                    while (std::getline(infile, line)) {
+                        const auto pos = line.find(name);
+                        if (pos != std::string::npos) {
+                            // @NOTE: +2 for ": "
+                            const std::string coords = line.substr(pos + strlen(name) + 2, line.length());
+                            return teleport(coords);
+                        }
+                    }
+                }
             }
         }
 
