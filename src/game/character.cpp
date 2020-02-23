@@ -100,7 +100,6 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
 
     // set model data from model info
     model_state->Reset();
-    // for (const auto& info : model_infos) {
     for (size_t i = 0; i < model_infos.size(); ++i) {
         const auto& info = model_infos[i];
         if (info.empty()) {
