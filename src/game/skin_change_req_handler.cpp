@@ -257,9 +257,9 @@ void SkinChangeRequestHandler::Update()
 }
 
 // @NOTE: Because all the models are cached and shared, they will also use the same skeleton lookup which will cause
-//		  visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can
-//        switch the skeleton lookup before the skin batches are drawn, and switch back to the original after to
-//        prevent this from happening. magic.
+//        visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can switch
+//        the skeleton lookup before the skin batches are drawn, and switch back to the original after to prevent this
+//        from happening. magic.
 void SkinChangeRequestHandler::DrawSkinBatches(jc::CModelRenderBlock *render_block, void *render_context,
                                                void *rbi_info, bool unknown)
 {

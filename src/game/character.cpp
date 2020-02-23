@@ -7,29 +7,21 @@
 
 #include "hashlittle.h"
 
-#ifdef DUMP_BONE_MAP_STUFF
-#include <fstream>
-static void DumpBoneMap(void* skin_swapper)
-{
-    auto          animated_model    = hk::func_call<void*>(0x1407D9F10, skin_swapper);
-    auto          animation_control = *(void**)((char*)animated_model + 0xE8);
-    std::ofstream stream("c:/users/aaron/desktop/bonemap.txt");
-    int64_t       bone_count = hk::func_call<int64_t>(0x140244810, animation_control); // GetBoneCount
-    for (decltype(bone_count) i = 0; i < bone_count; ++i) {
-        auto name_hash = hk::func_call<uint32_t>(0x140244830, animation_control, i); // GetBoneIndexHashedName
-        stream << "std::pair<uint32_t, uint32_t>{" << name_hash << ", " << i << "}," << std::endl;
-    }
-    stream.close();
-}
-#endif
-
 namespace jc
 {
-static uint32_t HASH_CLASS_HASH = "_class_hash"_hash_little;
-static uint32_t HASH_CCHARACTER = "CCharacter"_hash_little;
-static uint32_t HASH_MODEL      = "model"_hash_little;
-static uint32_t HASH_SKELETON   = "skeleton"_hash_little;
-static uint32_t HASH_FILEPATH   = "filepath"_hash_little;
+// runtime container hashes
+static const uint32_t HASH_CLASS_HASH = "_class_hash"_hash_little;
+static const uint32_t HASH_CCHARACTER = "CCharacter"_hash_little;
+static const uint32_t HASH_MODEL      = "model"_hash_little;
+static const uint32_t HASH_SKELETON   = "skeleton"_hash_little;
+static const uint32_t HASH_FILEPATH   = "filepath"_hash_little;
+static const uint32_t HASH_WEIGHT     = "Weight"_hash_little;
+
+// skeleton hashes
+static const uint32_t HASH_SKEL_RICO      = "animations/skeletons/characters/rico.bsk"_hash_little;
+static const uint32_t HASH_SKEL_WORLD     = "animations/skeletons/characters/world_sim.bsk"_hash_little;
+static const uint32_t HASH_SKEL_COMBATANT = "animations/skeletons/characters/combatant.bsk"_hash_little;
+static const uint32_t HASH_SKEL_TITAN     = "animations/skeletons/characters/titan.bsk"_hash_little;
 
 static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* container)
 {
@@ -40,8 +32,9 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
         return;
     }
 
-    uint32_t                           skeleton_hash = 0;
-    std::vector<std::vector<uint32_t>> model_infos;
+    uint32_t                                             skeleton_hash = 0;
+    std::vector<std::vector<std::pair<uint32_t, float>>> model_infos;
+    std::vector<float>                                   model_infos_weight_sum;
 
     // get all model info from runtime container
     CRuntimeContainer rc{container->m_base};
@@ -57,6 +50,7 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
                 // CGameObjectUtil::CountSubComponents
                 int32_t count = hk::func_call<int32_t>(0x1402A6CA0, &rc, 0xC160E555);
                 model_infos.resize(count);
+                model_infos_weight_sum.resize(count);
 
                 uint32_t current_info_slot = 0;
 
@@ -68,64 +62,88 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
                     if (sub_rc.GetHash(HASH_CLASS_HASH) == 0xC160E555) {
                         CRuntimeContainer sub_sub_rc{sub_rc.m_base};
 
+                        float weight_sum = 0.0f;
+
                         for (auto b = sub_rc.begin(); b != sub_rc.end(); ++b) {
                             sub_sub_rc.m_container = b;
 
                             // model entry
                             if (sub_sub_rc.GetHash(HASH_CLASS_HASH) == 0xAA09A7DC) {
-                                model_hash = sub_sub_rc.GetHash(HASH_FILEPATH);
-                                model_infos[current_info_slot].push_back(model_hash);
-                                break;
+                                model_hash   = sub_sub_rc.GetHash(HASH_FILEPATH);
+                                float weight = sub_sub_rc.GetFloat(HASH_WEIGHT);
+
+                                model_infos[current_info_slot].push_back({model_hash, weight});
+                                weight_sum += weight;
                             }
                         }
 
+                        model_infos_weight_sum[current_info_slot] = weight_sum;
                         ++current_info_slot;
                     }
                 }
             } else {
                 model_infos.resize(1);
-                model_infos[0].push_back(model_hash);
+                model_infos[0].push_back({model_hash, 0.0f});
             }
 
             break;
         }
     }
 
-    // set model data from model info
-    if (!model_infos.empty()) {
-        model_state->Reset();
-
-        for (const auto& info : model_infos) {
-            if (info.empty()) {
-                continue;
-            }
-
-            model_state->SetModel(model_state->m_modelCount, info[0], character->m_worldTransform,
-                                  &animated_model->m_animationController->m_skinningPalette);
-        }
+    // no model to set, don't continue or we might have weird issues with skeleton.
+    if (model_infos.empty()) {
+#ifdef _DEBUG
+        __debugbreak();
+#endif
+        return;
     }
 
-#ifdef DUMP_BONE_MAP_STUFF
-    // DumpBoneMap(character);
-    jc::CSpawnSystem::instance().Spawn("titan_enemy_001", character->m_worldTransform,
-                                       [](const jc::spawned_objects& objects, void*) {
-                                           // objects[2] isn't a guarentee to be a CSkinSwapper instance.
-                                           // if a crash happens here, check the objects array for the correct index for
-                                           // this entity!
-                                           DumpBoneMap(objects[2].get());
-                                       });
-#endif
+    // set model data from model info
+    model_state->Reset();
+    // for (const auto& info : model_infos) {
+    for (size_t i = 0; i < model_infos.size(); ++i) {
+        const auto& info = model_infos[i];
+        if (info.empty()) {
+            continue;
+        }
+
+        uint32_t model_hash = info[0].first;
+
+        // if we have multiple models, fetch a random one!
+        if (info.size() > 1) {
+            // rotate random seed
+            uint32_t random_seed    = *(uint32_t*)0x142C73A98;
+            random_seed             = 214013 * random_seed + 2531011;
+            *(uint32_t*)0x142C73A98 = random_seed;
+
+            // generate a random number
+            auto rng       = (((random_seed >> 16) | 0x3f8000) << 8);
+            auto rng_float = *((float*)&rng);
+
+            // choose a random model from the slots vector
+            auto rng_weight = (rng_float - 1.0f) * model_infos_weight_sum[i];
+            for (const auto& slot_info : info) {
+                rng_weight = (rng_weight - slot_info.second);
+                if (rng_weight <= 0.0f) {
+                    model_hash = slot_info.first;
+                    break;
+                }
+            }
+        }
+
+        model_state->SetModel(model_state->m_modelCount, model_hash, character->m_worldTransform,
+                              &animated_model->m_animationController->m_skinningPalette);
+    }
+
+    // @TODO: fix CSkinSwapper copying model parts for ^ this (problematic when switching rico skin within the main menu
+    // as it will copy the current model we just set, and the skeleton map will be bad after we change back)
 
     // @TODO: we want to do this, but not before the new skeleton is mapped,
     //		  otherwise we get an ugly flash of the model in T pose.
     SkeletonLookup::Get()->Empty();
 
-    // rico skeleton		= 0xec0124bc (animations/skeletons/characters/rico.bsk)
-    // other skeleton		= 0x7eecb71b (animations/skeletons/characters/world_sim.bsk)
-    // combatant skeleton	= 0x5bdbe118 (animations/skeletons/characters/combatant.bsk)
-    // titan skeleton		= 0x81425e27 (animations/skeletons/characters/titan.bsk)
-    if (skeleton_hash == 0x7eecb71b || skeleton_hash == 0x5bdbe118 || skeleton_hash == 0x81425e27) {
-        // fix bone mapping
+    // only remap ped-character related skeletons
+    if (skeleton_hash == HASH_SKEL_WORLD || skeleton_hash == HASH_SKEL_COMBATANT || skeleton_hash == HASH_SKEL_TITAN) {
         for (decltype(model_state->m_modelCount) i = 0; i < model_state->m_modelCount; ++i) {
             auto instance = model_state->m_slot[i].m_modelInstance;
             auto model    = instance->m_model.m_handle->m_ptr;
@@ -150,11 +168,12 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
                 }
             }
         }
-    } else {
-#ifdef _DEBUG
-        __debugbreak();
-#endif
     }
+#ifdef _DEBUG
+    else if (skeleton_hash != HASH_SKEL_RICO) {
+        __debugbreak();
+    }
+#endif
 }
 
 void CCharacter::ChangeSkin(CSharedString& model_name, std::function<void()> callback)

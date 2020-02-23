@@ -57,7 +57,9 @@ class CRuntimeContainer
 
     float GetFloat(const uint32_t key)
     {
-        return 0.0f;
+        float value = 0.0f;
+        hk::func_call<void>(0x1478A6200, this, key, &value);
+        return value;
     }
 };
 
