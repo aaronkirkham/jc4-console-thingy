@@ -7,6 +7,7 @@
 #pragma pack(push, 1)
 namespace jc
 {
+class CGameObject;
 using spawned_objects = std::vector<std::shared_ptr<CGameObject>>;
 
 class CSpawnSystem

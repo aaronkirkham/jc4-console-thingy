@@ -3,17 +3,13 @@
 #include "hooking/hooking.h"
 #include "xinput9_1_0.h"
 
-#include "graphics.h"
 #include "input.h"
-#include "util.h"
 
-#include "game/clock.h"
-#include "game/debug_renderer_impl.h"
-#include "game/device.h"
-#include "game/game_object.h"
 #include "game/game_world.h"
 #include "game/player_manager.h"
 #include "game/spawn_system.h"
+
+#include "game/patches.h"
 
 #include "commands/event.h"
 #include "commands/spawn.h"
@@ -46,9 +42,10 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             return TRUE;
         }
 
-        // allocate a section for hooking things
-        VirtualAlloc((LPVOID)0x0000000160000000, 0x6000000, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+        // init
+        jc::InitPatchesAndHooks();
 
+        // register commands
         Input::Get()->RegisterCommand(std::make_unique<EventCommand>());
         Input::Get()->RegisterCommand(std::make_unique<SpawnCommand>());
         Input::Get()->RegisterCommand(std::make_unique<WorldCommand>());
@@ -57,60 +54,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         Input::Get()->RegisterCommand("exit",
                                       [](const std::string &arguments) { TerminateProcess(GetCurrentProcess(), -1); });
 #endif
-
-#ifdef DEBUG
-        bool quick_start = true;
-#else
-        bool quick_start = (strstr(GetCommandLine(), "-quickstart") != nullptr);
-#endif
-
-        // enable quick start
-        if (quick_start) {
-            // quick start
-            hk::put<bool>(0x142CB8F40, true);
-
-            // IsIntroSequenceComplete always returns true
-            hk::put<uint32_t>(0x140E935B0, 0x90C301B0);
-
-            // IsIntroMovieComplete always returns true
-            hk::put<uint32_t>(0x140E93530, 0x90C301B0);
-        }
-
-        static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> wndproc(0x140C7FB50);
-        wndproc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            auto game_state   = *(uint32_t *)0x142CB8F24;
-            auto suspend_game = *(bool *)0x142CBDAF0;
-            auto clock        = &jc::Base::CClock::instance();
-
-            if (game_state == 3 && clock) {
-                if (!suspend_game && !clock->m_paused) {
-                    if (Input::Get()->WndProc(uMsg, wParam, lParam)) {
-                        return 0;
-                    }
-                }
-                // disable input if the game is suspended or the clock is paused.
-                // This fixes issues with window messages not being handled as we stole the message
-                else if (Input::Get()->IsInputEnabled()) {
-                    Input::Get()->EnableInput(false);
-                }
-            }
-
-            return wndproc.call(hwnd, uMsg, wParam, lParam);
-        });
-
-        static hk::inject_jump<void, jc::HDevice_t *> flip(0x140FA2C70);
-        flip.inject([](jc::HDevice_t *device) -> void {
-            Graphics::Get()->BeginDraw(device);
-
-            // draw input
-            Input::Get()->Draw();
-
-            Graphics::Get()->EndDraw();
-
-            flip.call(device);
-        });
-    } else if (fdwReason == DLL_PROCESS_DETACH) {
-        Graphics::Get()->Shutdown();
     }
 
     return TRUE;
