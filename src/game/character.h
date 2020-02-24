@@ -90,8 +90,11 @@ class CCharacter
     SPartialModelState m_modelState; // 5d8 - 6e8
     char               _pad3[0x1580];
     CAnimatedModel     m_animatedModel; // 1c68 - 1aa8
+    char               _pad4[0x460];
+    bool               m_unlimitedAmmo; // 2288
 };
 static_assert(offsetof(CCharacter, m_modelState) == 0x5D8);
 static_assert(offsetof(CCharacter, m_animatedModel) == 0x1C68);
+static_assert(offsetof(CCharacter, m_unlimitedAmmo) == 0x2288);
 }; // namespace jc
 #pragma pack(pop)
