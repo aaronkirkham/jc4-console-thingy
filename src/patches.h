@@ -2,5 +2,5 @@
 
 namespace jc
 {
-void InitPatchesAndHooks();
+bool InitPatchesAndHooks();
 };
