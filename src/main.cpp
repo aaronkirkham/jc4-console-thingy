@@ -9,7 +9,7 @@
 #include "game/player_manager.h"
 #include "game/spawn_system.h"
 
-#include "game/patches.h"
+#include "patches.h"
 
 #include "commands/event.h"
 #include "commands/skin.h"
@@ -35,16 +35,10 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             XInputSetState_ = (XInputSetState_t)GetProcAddress(module, "XInputSetState");
         }
 
-        // if we are running on the wrong version, don't continue
-        if (*(uint32_t *)0x141E7EE40 != 0x6c617641) {
-#ifdef DEBUG
-            MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
-#endif
+        // init
+        if (!jc::InitPatchesAndHooks()) {
             return TRUE;
         }
-
-        // init
-        jc::InitPatchesAndHooks();
 
         // register commands
         Input::Get()->RegisterCommand(std::make_unique<EventCommand>());

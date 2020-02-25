@@ -1,8 +1,8 @@
 ﻿#include "patches.h"
-#include "character.h"
 
-#include "clock.h"
-#include "skin_change_req_handler.h"
+#include "game/character.h"
+#include "game/clock.h"
+#include "game/skin_change_req_handler.h"
 
 #include "graphics.h"
 #include "input.h"
@@ -40,8 +40,16 @@ static void       CFiringModule__ConsumeAmmo(CFiringModule *_this, uintptr_t wea
     _this->m_ammoType = ammo_type;
 }
 
-void InitPatchesAndHooks()
+bool InitPatchesAndHooks()
 {
+    // check current game version
+    if (*(uint32_t *)0x141E7EE40 != 0x6c617641) {
+#ifdef DEBUG
+        MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
+#endif
+        return false;
+    }
+
     // allocate a section for hooking things
     VirtualAlloc((LPVOID)0x0000000160000000, 0x6000000, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
@@ -108,5 +116,7 @@ void InitPatchesAndHooks()
 
     // override ConsumeAmmo to fix unlimited ammo not being applied to vehicles
     CFiringModule__ConsumeAmmo_orig = hk::detour_func(0x140728840, CFiringModule__ConsumeAmmo);
+
+    return true;
 }
 }; // namespace jc

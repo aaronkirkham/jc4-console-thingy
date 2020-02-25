@@ -23,8 +23,9 @@ class Input : public Singleton<Input>
     std::string              m_cmdText        = "";
     std::string              m_cmdArguments   = "";
     std::vector<std::string> m_hints;
-    int32_t                  m_selectedHint = -1;
-    int32_t                  m_hintPage     = 0;
+    int32_t                  m_selectedHint   = -1;
+    int32_t                  m_hintPage       = 0;
+    bool                     m_controlPressed = false;
 
     std::unordered_map<std::string, std::unique_ptr<ICommand>> m_commands;
     std::unordered_map<std::string, command_t>                 m_fnCommands;
@@ -38,12 +39,8 @@ class Input : public Singleton<Input>
 
     void RegisterCommand(std::unique_ptr<ICommand> cmd)
     {
+        cmd->Init();
         m_commands[cmd->GetCommand()] = std::move(cmd);
-    }
-
-    void RegisterCommand(const std::string& command, std::unique_ptr<ICommand> cmd)
-    {
-        m_commands[command] = std::move(cmd);
     }
 
     void RegisterCommand(const std::string& command, command_t fn)

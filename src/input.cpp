@@ -82,6 +82,10 @@ void Input::Draw()
 
 bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
 {
+    if (m_controlPressed && (message == WM_KEYUP && wParam == VK_CONTROL)) {
+        m_controlPressed = false;
+    }
+
     switch (message) {
         case WM_KEYDOWN: {
             // tilde key down and the previous key state was up
@@ -91,11 +95,14 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                 return true;
             }
 
-            // TODO(aaronlad): clean some of this up..
-
             // handle history navigation
             if (m_drawInput) {
                 switch (wParam) {
+                    case VK_CONTROL: {
+                        m_controlPressed = true;
+                        break;
+                    }
+
                     // handle CTRL + V
                     case 0x56: {
                         if (GetAsyncKeyState(VK_CONTROL) && (lParam >> 30) == 0) {
@@ -207,7 +214,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                 }
 
                 // ignore input if the control key is down
-                if (GetAsyncKeyState(VK_CONTROL)) {
+                if (m_controlPressed) {
                     break;
                 }
 
@@ -313,7 +320,7 @@ bool Input::UpdateCurrentCommand(bool update_hints)
     return false;
 }
 
-void Input::AddToHistory(const std::string &command)
+void Input::AddToHistory(const std::string& command)
 {
     if (m_history.back() != command) {
         // clear after 100 entries

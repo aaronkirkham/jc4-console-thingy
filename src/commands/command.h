@@ -5,7 +5,8 @@
 class ICommand
 {
   public:
-    virtual const char*              GetCommand()                           = 0;
+    virtual const char*              GetCommand() = 0;
+    virtual void                     Init(){};
     virtual bool                     Handler(const std::string& arguments)  = 0;
     virtual std::vector<std::string> GetHints(const std::string& arguments) = 0;
 };
