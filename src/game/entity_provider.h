@@ -61,6 +61,13 @@ class CRuntimeContainer
         hk::func_call<void>(0x1478A6200, this, key, &value);
         return value;
     }
+
+    int32_t GetInteger(const uint32_t key)
+    {
+        int32_t value = 0;
+        hk::func_call<void>(0x1478A5E90, this, key, &value);
+        return value;
+    }
 };
 
 class CResourceLoader

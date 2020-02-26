@@ -41,7 +41,36 @@ struct CModel {
     uint16_t            m_totalRenderBlockCount;
 };
 
+struct CMetaData {
+    int16_t m_DataType;
+    int16_t m_RefCount;
+};
+
+struct CMetaEnvironmentalFX : public CMetaData {
+  public:
+    static CMetaEnvironmentalFX* Create()
+    {
+        return hk::func_call<CMetaEnvironmentalFX*>(0x14A0DCBA0);
+    }
+
+  public:
+    char      _pad[0xC];
+    CVector4f m_tintColor1;
+    CVector4f m_tintColor2;
+    CVector4f m_tintColor3;
+    CVector4f m_skinTint;
+    CVector4f m_skinSubTint;
+};
+static_assert(sizeof(CMetaEnvironmentalFX) == 0x60);
+
 struct CModelInstance {
+  public:
+    void SetMetaData(CMetaData* meta_data)
+    {
+        hk::func_call<void>(0x147912250, this, meta_data);
+    }
+
+  public:
     char m_rbiInfo[0xC0];
     char _pad[0x18];
     struct {
@@ -60,7 +89,12 @@ struct SPartialModelState {
 
     SModelState m_slot[4];
     uint64_t    m_modelCount;
-    char        _pad[0x28];
+    bool        m_setSkinTint;
+    char        _pad[0x3];
+    CVector4f   m_skinTint;
+    bool        m_setSkinSubTint;
+    char        _pad2[0x3];
+    CVector4f   m_skinSubTint;
 
     void Reset()
     {
@@ -96,5 +130,33 @@ class CCharacter
 static_assert(offsetof(CCharacter, m_modelState) == 0x5D8);
 static_assert(offsetof(CCharacter, m_animatedModel) == 0x1C68);
 static_assert(offsetof(CCharacter, m_unlimitedAmmo) == 0x2288);
+
+class CCharacterManager
+{
+  public:
+    static CCharacterManager& instance()
+    {
+        return **(CCharacterManager**)0x142CB1D40;
+    }
+
+    CVector4f GetSkinTint(uint32_t setting)
+    {
+        CVector4f result{};
+        hk::func_call<void>(0x1484610A0, &m_skinTintData, &result, setting);
+        return result;
+    }
+
+    CVector4f GetRandomSkinSubTint()
+    {
+        CVector4f result{};
+        hk::func_call<void>(0x14845A990, &m_skinTintData, &result);
+        return result;
+    }
+
+  public:
+    char _pad[0x270];
+    struct SCharacterSkinTintData {
+    } m_skinTintData;
+};
 }; // namespace jc
 #pragma pack(pop)
