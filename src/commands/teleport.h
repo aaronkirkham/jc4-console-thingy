@@ -35,7 +35,13 @@ class TeleportCommand : public ICommand
                 return true;
             }
         } else {
-            static auto Teleport = [](const CVector3f& position) {
+            static auto Teleport = [](CVector3f& position) {
+                // @FUNFACT: game will crash if you teleport to 0,x,0
+                if (position.x == 0 && position.z == 0) {
+                    position.x = 1.0f;
+                    position.z = 1.0f;
+                }
+
                 CMatrix4f world{};
                 world.m[3].x = position.x;
                 world.m[3].y = position.y;
