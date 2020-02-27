@@ -105,7 +105,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
 
                     // handle CTRL + V
                     case 0x56: {
-                        if (GetAsyncKeyState(VK_CONTROL) && (lParam >> 30) == 0) {
+                        if (m_controlPressed && (lParam >> 30) == 0) {
                             m_selectedHint = -1;
                             m_hintPage     = 0;
                             m_history[0].append(util::GetClipboard());
