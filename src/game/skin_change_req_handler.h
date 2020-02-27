@@ -26,8 +26,6 @@ class SkinChangeRequestHandler : public Singleton<SkinChangeRequestHandler>
     SkinChangeRequestHandler();
     void Request(CSharedString &resource_path, std::function<void(const CRuntimeContainer *)>);
     void Update();
-
-    static void DrawSkinBatches(CModelRenderBlock *render_block, void *render_context, void *rbi_info, bool unknown);
 };
 
 class SkeletonLookup : public Singleton<SkeletonLookup>

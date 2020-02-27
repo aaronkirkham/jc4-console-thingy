@@ -10,9 +10,10 @@
 namespace jc
 {
 // runtime container hashes
-static const uint32_t HASH_CLASS_HASH = "_class_hash"_hash_little;
-static const uint32_t HASH_CCHARACTER = "CCharacter"_hash_little;
-static const uint32_t HASH_SKELETON   = "skeleton"_hash_little;
+static const uint32_t HASH_CLASS_HASH   = "_class_hash"_hash_little;
+static const uint32_t HASH_CCHARACTER   = "CCharacter"_hash_little;
+static const uint32_t HASH_SKELETON     = "skeleton"_hash_little;
+static const uint32_t HASH_CSKINSWAPPER = "CSkinSwapper"_hash_little;
 
 // skeleton hashes
 static const uint32_t HASH_SKEL_RICO      = "animations/skeletons/characters/rico.bsk"_hash_little;
@@ -26,9 +27,29 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
     SPartialModelState* model_state   = &character->m_modelState;
     SPartialModelData   model_data{};
 
-    // @TODO: fix CSkinSwapper copying model parts from model_state (problematic when switching rico skin within
-    // the main menu as it will copy the current model we just set, and the skeleton map will be bad after we
-    // change back)
+    // update the character skin swapper instance, this will fix problems with changing rico skin via the main menu
+    auto children = *(std::vector<std::shared_ptr<CGameObject>>*)((char*)character + 0x180);
+    for (auto child : children) {
+        if (child && *child->GetClassHash() == HASH_CSKINSWAPPER) {
+            auto skin_swapper = (CSkinSwapper*)child.get();
+
+            if (skin_swapper->m_currentSkin == skin_swapper->m_defaultSkin) {
+                for (decltype(model_state->m_modelCount) i = 0; i < model_state->m_modelCount; ++i) {
+                    model_state->m_slot[i].m_modelInstance->m_flags &= 0xFFFFFFEEu;
+                }
+
+                // copy old model info
+                static CMatrix4f identity{};
+                hk::func_call<void>(0x147BC1B50, &skin_swapper->m_oldModelState, model_state, &identity,
+                                    &character->m_animatedModel.m_animationController->m_skinningPalette);
+            }
+
+            // @NOTE: can be anything just not the default skin hash.
+            skin_swapper->m_requestedSkin = 0xDEADBEEF;
+            skin_swapper->m_currentSkin   = 0xDEADBEEF;
+            break;
+        }
+    }
 
     // get model data from runtime container
     CRuntimeContainer rc{container->m_base};
@@ -49,8 +70,7 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
         }
     }
 
-    // @TODO: we want to do this, but not before the new skeleton is mapped,
-    //		  otherwise we get an ugly flash of the model in T pose.
+    //
     SkeletonLookup::Get()->Empty();
 
     // only remap ped-character related skeletons

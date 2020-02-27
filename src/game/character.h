@@ -48,8 +48,11 @@ struct CModelInstance {
             CModel* m_ptr;
         } * m_handle;
     } m_model;
+    char     _pad2[0x18];
+    uint32_t m_flags;
 };
 static_assert(offsetof(CModelInstance, m_model) == 0xD8);
+static_assert(offsetof(CModelInstance, m_flags) == 0xF8);
 
 struct SPartialModelData {
   public:
@@ -80,7 +83,6 @@ struct SPartialModelData {
     TArray<SModelSlot> m_slots;
     void*              m_skinTintData;
 };
-
 static_assert(sizeof(SPartialModelData::SModelEntry) == 0xC);
 static_assert(sizeof(SPartialModelData::STintEntry) == 0x28);
 static_assert(sizeof(SPartialModelData::SModelSlot) == 0x38);
@@ -98,6 +100,18 @@ struct SPartialModelState {
 };
 static_assert(sizeof(SPartialModelState::SModelState) == 0x38);
 static_assert(sizeof(SPartialModelState) == 0x110);
+
+class CSkinSwapper : public CGameObject
+{
+  public:
+    char               _pad[0x1C8];
+    uint32_t           m_requestedSkin;
+    uint32_t           m_currentSkin;
+    SPartialModelState m_oldModelState;
+    uint32_t           m_defaultSkin;
+};
+static_assert(offsetof(CSkinSwapper, m_requestedSkin) == 0x1d0);
+static_assert(offsetof(CSkinSwapper, m_defaultSkin) == 0x2e8);
 
 class CSharedString;
 class CCharacter

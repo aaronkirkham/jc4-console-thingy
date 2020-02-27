@@ -12,8 +12,6 @@
 
 namespace jc
 {
-static uintptr_t *DrawSkinBatches_orig = nullptr;
-
 SkinChangeRequestHandler::SkinChangeRequestHandler()
 {
     static std::once_flag _once;
@@ -26,8 +24,40 @@ SkinChangeRequestHandler::SkinChangeRequestHandler()
         m_provider->m_priority         = 1; // high
         m_provider->m_streamerPriority = 4; // very high
 
-        // NGraphicsEngine::CRenderBlockCharacter::DrawSkinBatches
-        DrawSkinBatches_orig = hk::detour_func(0x14A36B420, DrawSkinBatches);
+        // @NOTE: Because all the models are cached and shared, they will also use the same skeleton lookup which will
+        // cause visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can
+        // switch the skeleton lookup before the skin batches are drawn, and switch back to the original after to
+        // prevent this from happening. magic.
+        static hk::inject_jump<void, jc::CModelRenderBlock *, void *, void *, bool> DrawSkinBatches(0x140D1A150);
+        DrawSkinBatches.inject(
+            [](jc::CModelRenderBlock *render_block, void *render_context, void *rbi_info, bool unknown) {
+                int16_t *original_skeleton_lookup = nullptr;
+
+                {
+                    std::lock_guard<std::mutex> lk{jc::SkeletonLookup::Get()->m_mutex};
+
+                    const auto skeleton_lookup = &jc::SkeletonLookup::Get()->m_lookup;
+                    const auto find_it         = skeleton_lookup->find(rbi_info);
+
+                    // set the custom skeleton lookup before render
+                    if (find_it != skeleton_lookup->end()) {
+                        const auto &lookup = (*find_it);
+                        const auto  it     = lookup.second.find(render_block);
+
+                        if (it != lookup.second.end() && (*it).second != nullptr) {
+                            original_skeleton_lookup               = render_block->m_mesh->m_skeletonLookup;
+                            render_block->m_mesh->m_skeletonLookup = (*it).second;
+                        }
+                    }
+                }
+
+                DrawSkinBatches.call(render_block, render_context, rbi_info, unknown);
+
+                // restore the original skeleton lookup after render
+                if (original_skeleton_lookup) {
+                    render_block->m_mesh->m_skeletonLookup = original_skeleton_lookup;
+                }
+            });
     });
 }
 
@@ -254,43 +284,6 @@ void SkinChangeRequestHandler::Update()
             __debugbreak();
 #endif
         });
-}
-
-// @NOTE: Because all the models are cached and shared, they will also use the same skeleton lookup which will cause
-//        visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can
-//        switch the skeleton lookup before the skin batches are drawn, and switch back to the original after to
-//        prevent this from happening. magic.
-void SkinChangeRequestHandler::DrawSkinBatches(jc::CModelRenderBlock *render_block, void *render_context,
-                                               void *rbi_info, bool unknown)
-{
-    int16_t *original_skeleton_lookup = nullptr;
-
-    {
-        std::lock_guard<std::mutex> lk{jc::SkeletonLookup::Get()->m_mutex};
-
-        const auto skeleton_lookup = &jc::SkeletonLookup::Get()->m_lookup;
-        const auto find_it         = skeleton_lookup->find(rbi_info);
-
-        // set the custom skeleton lookup before render
-        if (find_it != skeleton_lookup->end()) {
-            const auto &lookup = (*find_it);
-            const auto  it     = lookup.second.find(render_block);
-
-            if (it != lookup.second.end() /* && (*it).second != nullptr*/) {
-                assert((*it).second != nullptr);
-
-                original_skeleton_lookup               = render_block->m_mesh->m_skeletonLookup;
-                render_block->m_mesh->m_skeletonLookup = (*it).second;
-            }
-        }
-    }
-
-    ((decltype(DrawSkinBatches) *)(DrawSkinBatches_orig))(render_block, render_context, rbi_info, unknown);
-
-    // restore the original skeleton lookup after render
-    if (original_skeleton_lookup) {
-        render_block->m_mesh->m_skeletonLookup = original_skeleton_lookup;
-    }
 }
 
 static std::array kBoneMappingsRico = {
@@ -535,6 +528,7 @@ void SkeletonLookup::Empty()
     for (auto &&lookup : m_lookup) {
         for (auto &&entry : lookup.second) {
             jc::_free(entry.second);
+            entry.second = nullptr;
         }
     }
 
