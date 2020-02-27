@@ -257,9 +257,9 @@ void SkinChangeRequestHandler::Update()
 }
 
 // @NOTE: Because all the models are cached and shared, they will also use the same skeleton lookup which will cause
-//        visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can switch
-//        the skeleton lookup before the skin batches are drawn, and switch back to the original after to prevent this
-//        from happening. magic.
+//        visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can
+//        switch the skeleton lookup before the skin batches are drawn, and switch back to the original after to
+//        prevent this from happening. magic.
 void SkinChangeRequestHandler::DrawSkinBatches(jc::CModelRenderBlock *render_block, void *render_context,
                                                void *rbi_info, bool unknown)
 {
@@ -268,15 +268,17 @@ void SkinChangeRequestHandler::DrawSkinBatches(jc::CModelRenderBlock *render_blo
     {
         std::lock_guard<std::mutex> lk{jc::SkeletonLookup::Get()->m_mutex};
 
-        const auto inst               = &jc::SkeletonLookup::Get()->m_rbiInstances;
-        const bool needs_skeleton_map = std::find(inst->begin(), inst->end(), rbi_info) != inst->end();
+        const auto skeleton_lookup = &jc::SkeletonLookup::Get()->m_lookup;
+        const auto find_it         = skeleton_lookup->find(rbi_info);
 
         // set the custom skeleton lookup before render
-        if (needs_skeleton_map) {
-            const auto lookup = &jc::SkeletonLookup::Get()->m_skeletonLookup;
-            const auto it     = lookup->find(render_block);
+        if (find_it != skeleton_lookup->end()) {
+            const auto &lookup = (*find_it);
+            const auto  it     = lookup.second.find(render_block);
 
-            if (it != lookup->end() && (*it).second != nullptr) {
+            if (it != lookup.second.end() /* && (*it).second != nullptr*/) {
+                assert((*it).second != nullptr);
+
                 original_skeleton_lookup               = render_block->m_mesh->m_skeletonLookup;
                 render_block->m_mesh->m_skeletonLookup = (*it).second;
             }
@@ -483,7 +485,7 @@ static std::array kBoneMappingsWorldSim = {
     std::pair<uint32_t, uint32_t>{2271170787, 84}, std::pair<uint32_t, uint32_t>{743077609, 85},
 };
 
-void SkeletonLookup::Make(CModelRenderBlock *render_block)
+void SkeletonLookup::Make(void *rbi_info, CModelRenderBlock *render_block)
 {
     assert(render_block && render_block->m_mesh);
 
@@ -523,20 +525,19 @@ void SkeletonLookup::Make(CModelRenderBlock *render_block)
     }
 
     std::lock_guard<std::mutex> lk{m_mutex};
-    m_skeletonLookup[render_block] = mapped_skeleton_lookup;
+    m_lookup[rbi_info][render_block] = mapped_skeleton_lookup;
 }
 
 void SkeletonLookup::Empty()
 {
     std::lock_guard<std::mutex> lk{m_mutex};
 
-    m_rbiInstances.clear();
-
-    for (auto &&lookup : m_skeletonLookup) {
-        jc::_free(lookup.second);
-        lookup.second = nullptr;
+    for (auto &&lookup : m_lookup) {
+        for (auto &&entry : lookup.second) {
+            jc::_free(entry.second);
+        }
     }
 
-    m_skeletonLookup.clear();
+    m_lookup.clear();
 }
 }; // namespace jc

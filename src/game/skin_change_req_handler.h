@@ -33,21 +33,14 @@ class SkinChangeRequestHandler : public Singleton<SkinChangeRequestHandler>
 class SkeletonLookup : public Singleton<SkeletonLookup>
 {
   public:
-    std::vector<void *>                      m_rbiInstances;
-    std::map<CModelRenderBlock *, int16_t *> m_skeletonLookup;
-    std::mutex                               m_mutex;
+    std::map<void *, std::map<CModelRenderBlock *, int16_t *>> m_lookup;
+    std::mutex                                                 m_mutex;
 
   public:
     SkeletonLookup()          = default;
     virtual ~SkeletonLookup() = default;
 
-    void SetRBIInfo(void *rbi_info)
-    {
-        std::lock_guard<std::mutex> lk{m_mutex};
-        m_rbiInstances.push_back(rbi_info);
-    }
-
-    void Make(CModelRenderBlock *render_block);
+    void Make(void *rbi_info, CModelRenderBlock *render_block);
     void Empty();
 };
 }; // namespace jc
