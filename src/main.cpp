@@ -20,7 +20,7 @@
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     // exit if not jc4
-    if (!GetModuleHandle("JustCause4.exe")) {
+    if (!GetModuleHandle("JustCause4.exe") && !GetModuleHandle("JustCause4GameCL.exe")) {
         return FALSE;
     }
 
