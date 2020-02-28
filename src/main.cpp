@@ -12,6 +12,7 @@
 #include "patches.h"
 
 #include "commands/event.h"
+#include "commands/skin.h"
 #include "commands/spawn.h"
 #include "commands/teleport.h"
 #include "commands/world.h"
@@ -43,6 +44,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         Input::Get()->RegisterCommand(std::make_unique<EventCommand>());
         Input::Get()->RegisterCommand(std::make_unique<SpawnCommand>());
         Input::Get()->RegisterCommand(std::make_unique<WorldCommand>());
+        Input::Get()->RegisterCommand(std::make_unique<SkinCommand>());
         Input::Get()->RegisterCommand(std::make_unique<TeleportCommand>());
 #ifdef DEBUG
         Input::Get()->RegisterCommand("exit",

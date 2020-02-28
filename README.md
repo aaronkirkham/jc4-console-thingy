@@ -13,6 +13,7 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
  - `spawn` - Spawn everything! Vehicles, characters, animals & props.
  - `event` - Trigger game events - **CAUTION** - Stick to using only the hints, unless you know what the event does
  - `world` - Change world parameters
+ - `skin` - Change player skin
 
 ### Controls
  - `Tilde` (\`~) or `F1` - Toggle the input box

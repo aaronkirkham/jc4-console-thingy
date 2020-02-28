@@ -24,7 +24,7 @@ class TeleportCommand : public ICommand
         if (arguments.find("save ") != std::string::npos) {
             char name[128] = {0};
             if (sscanf_s(arguments.c_str(), "save %[^\n]s", &name, 128) == 1) {
-                auto& transform = jc::CPlayerManager::instance().GetLocalPlayerCharacter()->m_transform;
+                auto& transform = jc::CPlayerManager::instance().GetLocalPlayerCharacter()->m_worldTransform;
                 m_saveFile.set(name, "%f %f %f", transform.m[3].x, transform.m[3].y, transform.m[3].z);
                 return true;
             }

@@ -2,6 +2,7 @@
 
 #include "game/character.h"
 #include "game/clock.h"
+#include "game/skin_change_req_handler.h"
 
 #include "graphics.h"
 #include "input.h"
@@ -104,6 +105,13 @@ bool InitPatchesAndHooks()
         Graphics::Get()->EndDraw();
 
         FlipThread.call(device);
+    });
+
+    // CPlayerManager::Update
+    static hk::inject_jump<void, void *, float> PlayerManagerUpdate(0x140B35860);
+    PlayerManagerUpdate.inject([](void *_this, float dt) {
+        PlayerManagerUpdate.call(_this, dt);
+        jc::SkinChangeRequestHandler::Get()->Update();
     });
 
     // override ConsumeAmmo to fix unlimited ammo not being applied to vehicles
