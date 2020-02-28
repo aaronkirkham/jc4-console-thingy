@@ -21,35 +21,24 @@ static const uint32_t HASH_SKEL_WORLD     = "animations/skeletons/characters/wor
 static const uint32_t HASH_SKEL_COMBATANT = "animations/skeletons/characters/combatant.bsk"_hash_little;
 static const uint32_t HASH_SKEL_TITAN     = "animations/skeletons/characters/titan.bsk"_hash_little;
 
-static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* container)
+CSkinSwapper* GetSkinSwapper(CCharacter* character)
 {
-    uint32_t            skeleton_hash = 0;
-    SPartialModelState* model_state   = &character->m_modelState;
-    SPartialModelData   model_data{};
-
-    // update the character skin swapper instance, this will fix problems with changing rico skin via the main menu
     auto children = *(std::vector<std::shared_ptr<CGameObject>>*)((char*)character + 0x180);
     for (auto child : children) {
         if (child && *child->GetClassHash() == HASH_CSKINSWAPPER) {
-            auto skin_swapper = (CSkinSwapper*)child.get();
-
-            if (skin_swapper->m_currentSkin == skin_swapper->m_defaultSkin) {
-                for (decltype(model_state->m_modelCount) i = 0; i < model_state->m_modelCount; ++i) {
-                    model_state->m_slot[i].m_modelInstance->m_flags &= 0xFFFFFFEEu;
-                }
-
-                // copy old model info
-                static CMatrix4f identity{};
-                hk::func_call<void>(0x147BC1B50, &skin_swapper->m_oldModelState, model_state, &identity,
-                                    &character->m_animatedModel.m_animationController->m_skinningPalette);
-            }
-
-            // @NOTE: can be anything just not the default skin hash.
-            skin_swapper->m_requestedSkin = 0xDEADBEEF;
-            skin_swapper->m_currentSkin   = 0xDEADBEEF;
-            break;
+            return (CSkinSwapper*)child.get();
         }
     }
+
+    return nullptr;
+}
+
+static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* container)
+{
+    auto                skin_swapper  = GetSkinSwapper(character);
+    uint32_t            skeleton_hash = 0;
+    SPartialModelState* model_state   = &character->m_modelState;
+    SPartialModelData   model_data{};
 
     // get model data from runtime container
     CRuntimeContainer rc{container->m_base};
@@ -58,6 +47,24 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
 
         if (rc.GetHash(HASH_CLASS_HASH) == HASH_CCHARACTER) {
             skeleton_hash = rc.GetHash(HASH_SKELETON);
+
+            // update the skin swapper instance, this will fix problems with changing rico skin via the main menu
+            if (skin_swapper) {
+                if (skin_swapper->m_currentSkin == skin_swapper->m_defaultSkin) {
+                    for (decltype(model_state->m_modelCount) i = 0; i < model_state->m_modelCount; ++i) {
+                        model_state->m_slot[i].m_modelInstance->m_flags &= 0xFFFFFFEEu;
+                    }
+
+                    // copy old model info
+                    static CMatrix4f identity{};
+                    hk::func_call<void>(0x147BC1B50, &skin_swapper->m_oldModelState, model_state, &identity,
+                                        &character->m_animatedModel.m_animationController->m_skinningPalette);
+                }
+
+                // @NOTE: can be anything just not the default skin hash.
+                skin_swapper->m_requestedSkin = 0xDEADBEEF;
+                skin_swapper->m_currentSkin   = 0xDEADBEEF;
+            }
 
             // parse runtime container to get model data
             hk::func_call<void>(0x14028C790, &model_data, &rc);
@@ -70,7 +77,11 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
         }
     }
 
-    //
+    if (!skeleton_hash) {
+        return;
+    }
+
+    // clear skeleton lookup
     SkeletonLookup::Get()->Empty();
 
     // only remap ped-character related skeletons
