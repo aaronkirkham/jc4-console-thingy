@@ -14,6 +14,11 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
  - `event` - Trigger game events - **CAUTION** - Stick to using only the hints, unless you know what the event does
  - `world` - Change world parameters
  - `skin` - Change player skin
+ - `tp` - Teleport player to position
+   - `tp <x> <y> <z>` - Go directly to coordinates
+   - `tp save <name>` - Save current coordinates as named location
+   - `tp <name>` - Go to saved named location
+   - `tp delete <name>` - Delete saved named location
 
 ### Controls
  - `Tilde` (\`~) or `F1` - Toggle the input box
