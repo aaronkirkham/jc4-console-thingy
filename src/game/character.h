@@ -119,6 +119,11 @@ class CCharacter
   public:
     void ChangeSkin(CSharedString& model_name, std::function<void()> callback = nullptr);
 
+    CGameObject* GetVehiclePtr()
+    {
+        return hk::func_call<CGameObject*>(0x14054FD50, this);
+    }
+
   public:
     char               _pad[0x114];
     CMatrix4f          m_worldTransform; // 114 - 154

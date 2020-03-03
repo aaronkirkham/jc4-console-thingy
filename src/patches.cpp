@@ -2,6 +2,7 @@
 
 #include "game/character.h"
 #include "game/clock.h"
+#include "game/player_manager.h"
 #include "game/skin_change_req_handler.h"
 
 #include "graphics.h"
@@ -38,6 +39,42 @@ static void       CFiringModule__ConsumeAmmo(CFiringModule *_this, uintptr_t wea
 
     // restore old ammo type
     _this->m_ammoType = ammo_type;
+}
+
+// if the local player is invulnerable, we want the same behaviour applied to their current vehicle
+void UpdateVehicleInvulnerability()
+{
+    static CGameObject *invul_vehicle   = nullptr;
+    static auto         SetInvulnerable = [](CGameObject *game_object, bool invulnerable) {
+        hk::func_call<void>(0x1485CE1E0, game_object, invulnerable);
+    };
+
+    const auto character = jc::CPlayerManager::GetLocalPlayerCharacter();
+    if (character) {
+        const auto vehicle = character->GetVehiclePtr();
+
+        if (vehicle) {
+            const bool char_invulnerable = (*(uint8_t *)((char *)character + 0x418) & 2);
+            const bool veh_invulnerable  = (*(uint8_t *)((char *)vehicle + 0x418) & 2);
+
+            // player is invulnerable, but the vehicle is not - set the vehicle invulnerable.
+            if (char_invulnerable && !veh_invulnerable) {
+                SetInvulnerable(vehicle, true);
+                invul_vehicle = vehicle;
+            }
+            // player is not invulnerable, but the vehicle is, AND the vehicle matches the vehicle we set
+            // invulnerability on (this should prevent weird cases where a vehicle was made invulnerable by the game)
+            else if ((!char_invulnerable && veh_invulnerable) && vehicle == invul_vehicle) {
+                goto make_vulnerable;
+            }
+        }
+        // player not in a vehicle and we manually set invulnerability on a vehicle - set the vehicle vulnerable
+        else if (invul_vehicle) {
+        make_vulnerable:
+            SetInvulnerable(invul_vehicle, false);
+            invul_vehicle = nullptr;
+        }
+    }
 }
 
 bool InitPatchesAndHooks()
@@ -112,6 +149,7 @@ bool InitPatchesAndHooks()
     PlayerManagerUpdate.inject([](void *_this, float dt) {
         PlayerManagerUpdate.call(_this, dt);
         jc::SkinChangeRequestHandler::Get()->Update();
+        UpdateVehicleInvulnerability();
     });
 
     // override ConsumeAmmo to fix unlimited ammo not being applied to vehicles
