@@ -325,7 +325,7 @@ void WriteHeader(const std::filesystem::path& path, FindPatternResult& addresses
     stream << "namespace jc\n";
     stream << "{\n";
 
-    stream << "enum Address : uintptr_t {\n";
+    stream << "enum Address {\n";
     for (const auto& address : addresses) {
         stream << "    " << address.first << ",\n";
     }

@@ -4,7 +4,7 @@
 
 namespace jc
 {
-enum Address : uintptr_t {
+enum Address {
     SANITY_CHECK,
     INST_CLOCK,
     INST_CHARACTER_MANAGER,
