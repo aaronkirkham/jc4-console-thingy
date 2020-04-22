@@ -284,11 +284,6 @@ FindPatternResult Generate(const char* name, const char* exepath)
         return disp_rebase(game_file, match).as<uintptr_t>();
     });
 
-    FindPattern("DAMAGEABLE_SET_INVULNERABLE", result, [&] {
-        auto match = pattern("80 A1 ? ? ? ? ? 00 D2", game_file).count(1).get(0).as<uintptr_t>();
-        return rebase(game_file, match);
-    });
-
     FindPattern("RUNTIME_CONTAINER_GET_HASH", result, [&] {
         auto match = pattern("48 8B CD E8 ? ? ? ? 33 FF 48 89 7C 24 ?", game_file).count(1).get(0).adjust(3).extract_call();
         return rebase(game_file, match);

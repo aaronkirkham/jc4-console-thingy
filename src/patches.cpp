@@ -84,7 +84,9 @@ static void PlayerManagerUpdate(CPlayerManager *_this, float dt)
     {
         static CGameObject *invul_vehicle   = nullptr;
         static auto         SetInvulnerable = [](CGameObject *game_object, bool invulnerable) {
-            meow_hook::func_call<void>(GetAddress(DAMAGEABLE_SET_INVULNERABLE), game_object, invulnerable);
+            // see: 0x1485ce1e0
+            *(uint8_t *)((char *)game_object + 0x418) &= 0xFDu;
+            *(uint8_t *)((char *)game_object + 0x418) |= 2 * invulnerable;
         };
 
         const auto character = jc::CPlayerManager::GetLocalPlayerCharacter();
