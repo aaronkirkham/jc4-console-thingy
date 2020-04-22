@@ -55,5 +55,5 @@ class Input : public Singleton<Input>
     }
 
     void Draw();
-    bool WndProc(uint32_t message, WPARAM wParam, LPARAM lParam);
+    bool FeedEvent(uint32_t message, WPARAM wParam, LPARAM lParam);
 };

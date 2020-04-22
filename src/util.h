@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <fstream>
 #include <map>
 #include <string>
+#include <unordered_map>
 
 namespace util
 {
@@ -44,6 +46,14 @@ static std::string GetClipboard(uint32_t max_length = 255)
     CloseClipboard();
 
     return result;
+}
+
+static std::wstring ToWideString(const std::string &str)
+{
+    wchar_t buf[0xfff] = {};
+    size_t  converted;
+    mbstowcs_s(&converted, buf, str.c_str(), sizeof(buf));
+    return std::wstring(buf);
 }
 
 class KeyValueFile

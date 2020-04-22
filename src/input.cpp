@@ -1,12 +1,11 @@
 #include <Windows.h>
 
+#include "util.h"
+
+#include "addresses.h"
 #include "graphics.h"
 #include "hashlittle.h"
 #include "input.h"
-#include "util.h"
-#include "vector.h"
-
-#include "hooking/hooking.h"
 
 #include "game/input_manager.h"
 #include "game/render_engine.h"
@@ -53,7 +52,7 @@ void Input::Draw()
     if (m_drawInput && debug_renderer) {
         // draw hints
         if (m_cmd && m_hints.size() > 0) {
-            const auto  count        = std::clamp<uint32_t>((m_hints.size() - m_hintPage), 0, NUM_HINTS_PER_PAGE);
+            const auto  count = std::clamp<uint32_t>(((uint32_t)m_hints.size() - m_hintPage), 0, NUM_HINTS_PER_PAGE);
             const float total_height = (HINT_ITEM_HEIGHT * count);
 
             debug_renderer->DebugRectGradient({0, (0.94f - total_height - 0.02f)}, {0.5f, 0.94f}, 0xB4000000,
@@ -80,7 +79,7 @@ void Input::Draw()
     }
 }
 
-bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
+bool Input::FeedEvent(uint32_t message, WPARAM wParam, LPARAM lParam)
 {
     if (m_controlPressed && (message == WM_KEYUP && wParam == VK_CONTROL)) {
         m_controlPressed = false;
@@ -139,7 +138,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                         // previous history item
                         if (m_selectedHint == -1) {
                             if (m_currentHistory == 0) {
-                                m_currentHistory = (m_history.size() - 1);
+                                m_currentHistory = ((int32_t)m_history.size() - 1);
                             } else if (m_currentHistory > 1) {
                                 --m_currentHistory;
                             }
@@ -273,7 +272,7 @@ bool Input::WndProc(uint32_t message, WPARAM wParam, LPARAM lParam)
                     default: {
                         m_selectedHint = -1;
                         m_hintPage     = 0;
-                        m_history[0].push_back((unsigned short)wParam);
+                        m_history[0].push_back((char)wParam);
                         UpdateCurrentCommand();
                         break;
                     }

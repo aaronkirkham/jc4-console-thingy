@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include "hooking/hooking.h"
-
 #include "allocator.h"
 #include "shared_string.h"
 
@@ -30,7 +28,7 @@ class CRuntimeContainer
             return nullptr;
         }
 
-        // return hk::func_call<SRuntimeContainer *>(0x1478C93B0, this);
+        // see: 0x1478C93B0
         return (SRuntimeContainer *)((m_base + m_container->m_numVariants + 8 * m_container->m_numVariants
                                       + m_container->m_dataOffset + 3)
                                      & 0xFFFFFFFFFFFFFFFCu);
@@ -51,7 +49,7 @@ class CRuntimeContainer
     uint32_t GetHash(const uint32_t key)
     {
         uint32_t hash = 0;
-        hk::func_call<void>(0x147627060, this, key, &hash);
+        meow_hook::func_call<void>(GetAddress(RUNTIME_CONTAINER_GET_HASH), this, key, &hash);
         return hash;
     }
 };

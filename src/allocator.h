@@ -1,17 +1,18 @@
 #pragma once
 
-#include "hooking/hooking.h"
+#include "addresses.h"
+#include "meow_hook/util.h"
 
 namespace jc
 {
 inline void* _alloc(size_t size)
 {
-    return hk::func_call<void*>(0x140A51DC0, size);
+    return meow_hook::func_call<void*>(GetAddress(ALLOC), size);
 }
 
-inline void _free(void* p)
+inline void _free(void* ptr)
 {
-    hk::func_call<void>(0x141AF8E1C, p);
+    meow_hook::func_call<void>(GetAddress(FREE), ptr);
 }
 
 template <typename T> class allocator

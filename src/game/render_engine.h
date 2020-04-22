@@ -10,7 +10,7 @@ class CRenderEngine
   public:
     static CRenderEngine& instance()
     {
-        return **(CRenderEngine**)0x142C84BE8;
+        return **(CRenderEngine**)GetAddress(INST_RENDER_ENGINE);
     }
 
   public:

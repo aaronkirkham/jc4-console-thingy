@@ -1,4 +1,5 @@
 ﻿#include "patches.h"
+#include "addresses.h"
 
 #include "game/character.h"
 #include "game/clock.h"
@@ -8,7 +9,8 @@
 #include "graphics.h"
 #include "input.h"
 
-#include "hooking/hooking.h"
+#include <meow_hook/detour.h>
+#include <meow_hook/memory.h>
 
 namespace jc
 {
@@ -22,8 +24,39 @@ struct CFiringModule {
     uint32_t m_ammoType; // 564
 };
 
-static uintptr_t *CFiringModule__ConsumeAmmo_orig = nullptr;
-static void       CFiringModule__ConsumeAmmo(CFiringModule *_this, uintptr_t weapon_data, int64_t ammo)
+LRESULT WndProc(HWND, UINT, WPARAM, LPARAM);
+void    FiringModuleConsumeAmmo(CFiringModule *, uintptr_t, int64_t);
+void    PlayerManagerUpdate(CPlayerManager *, float);
+
+static decltype(WndProc) *                pfn_WndProc     = nullptr;
+static decltype(FiringModuleConsumeAmmo) *pfn_ConsumeAmmo = nullptr;
+static decltype(PlayerManagerUpdate) *    pfn_Update      = nullptr;
+
+LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    const auto &input = Input::Get();
+
+    const uint32_t game_state   = *(uint32_t *)GetAddress(VAR_GAME_STATE);
+    const bool     suspend_game = *(bool *)GetAddress(VAR_SUSPEND_GAME);
+    auto           clock        = &jc::Base::CClock::instance();
+
+    if (game_state == 3 && clock) {
+        if (!suspend_game && !clock->m_paused) {
+            if (input->FeedEvent(msg, wParam, lParam)) {
+                return 0;
+            }
+        }
+        // disable input if the game is suspended or the clock is paused.
+        // This fixes issues with window messages not being handled as we stole the message
+        else if (input->IsInputEnabled()) {
+            input->EnableInput(false);
+        }
+    }
+
+    return pfn_WndProc(hwnd, msg, wParam, lParam);
+}
+
+static void FiringModuleConsumeAmmo(CFiringModule *_this, uintptr_t weapon_data, int64_t ammo)
 {
     const uint32_t ammo_type = _this->m_ammoType;
 
@@ -35,126 +68,82 @@ static void       CFiringModule__ConsumeAmmo(CFiringModule *_this, uintptr_t wea
         }
     }
 
-    ((decltype(CFiringModule__ConsumeAmmo) *)(CFiringModule__ConsumeAmmo_orig))(_this, weapon_data, ammo);
+    pfn_ConsumeAmmo(_this, weapon_data, ammo);
 
     // restore old ammo type
     _this->m_ammoType = ammo_type;
 }
 
-// if the local player is invulnerable, we want the same behaviour applied to their current vehicle
-void UpdateVehicleInvulnerability()
+static void PlayerManagerUpdate(CPlayerManager *_this, float dt)
 {
-    static CGameObject *invul_vehicle   = nullptr;
-    static auto         SetInvulnerable = [](CGameObject *game_object, bool invulnerable) {
-        hk::func_call<void>(0x1485CE1E0, game_object, invulnerable);
-    };
+    pfn_Update(_this, dt);
 
-    const auto character = jc::CPlayerManager::GetLocalPlayerCharacter();
-    if (character) {
-        const auto vehicle = character->GetVehiclePtr();
+    jc::SkinChangeRequestHandler::Get()->Update();
 
-        if (vehicle) {
-            const bool char_invulnerable = (*(uint8_t *)((char *)character + 0x418) & 2);
-            const bool veh_invulnerable  = (*(uint8_t *)((char *)vehicle + 0x418) & 2);
+    // if the local player is invulnerable, we want the same behaviour applied to their current vehicle
+    {
+        static CGameObject *invul_vehicle   = nullptr;
+        static auto         SetInvulnerable = [](CGameObject *game_object, bool invulnerable) {
+            meow_hook::func_call<void>(GetAddress(DAMAGEABLE_SET_INVULNERABLE), game_object, invulnerable);
+        };
 
-            // player is invulnerable, but the vehicle is not - set the vehicle invulnerable.
-            if (char_invulnerable && !veh_invulnerable) {
-                SetInvulnerable(vehicle, true);
-                invul_vehicle = vehicle;
+        const auto character = jc::CPlayerManager::GetLocalPlayerCharacter();
+        if (character) {
+            const auto vehicle = character->GetVehiclePtr();
+
+            if (vehicle) {
+                const bool char_invulnerable = (*(uint8_t *)((char *)character + 0x418) & 2);
+                const bool veh_invulnerable  = (*(uint8_t *)((char *)vehicle + 0x418) & 2);
+
+                // player is invulnerable, but the vehicle is not - set the vehicle invulnerable.
+                if (char_invulnerable && !veh_invulnerable) {
+                    SetInvulnerable(vehicle, true);
+                    invul_vehicle = vehicle;
+                }
+                // player is not invulnerable, but the vehicle is, AND the vehicle matches the vehicle we set
+                // invulnerability on (this should prevent weird cases where a vehicle was made invulnerable by the
+                // game)
+                else if ((!char_invulnerable && veh_invulnerable) && vehicle == invul_vehicle) {
+                    goto make_vulnerable;
+                }
             }
-            // player is not invulnerable, but the vehicle is, AND the vehicle matches the vehicle we set
-            // invulnerability on (this should prevent weird cases where a vehicle was made invulnerable by the game)
-            else if ((!char_invulnerable && veh_invulnerable) && vehicle == invul_vehicle) {
-                goto make_vulnerable;
+            // player not in a vehicle and we manually set invulnerability on a vehicle - set the vehicle vulnerable
+            else if (invul_vehicle) {
+            make_vulnerable:
+                SetInvulnerable(invul_vehicle, false);
+                invul_vehicle = nullptr;
             }
-        }
-        // player not in a vehicle and we manually set invulnerability on a vehicle - set the vehicle vulnerable
-        else if (invul_vehicle) {
-        make_vulnerable:
-            SetInvulnerable(invul_vehicle, false);
-            invul_vehicle = nullptr;
         }
     }
 }
 
 bool InitPatchesAndHooks()
 {
-    // check current game version
-    if (*(uint32_t *)0x141E7EE40 != 0x6c617641) {
+    // basic sanity check, ensure the game version is what we are expecting.
+    // this will prevent crashes if the game updates, but someone is using an old version of this mod.
+    if (strcmp((const char *)GetAddress(SANITY_CHECK), "Avalanche Engine") != 0) {
 #ifdef DEBUG
-        MessageBox(nullptr, "Wrong version.", nullptr, MB_ICONERROR | MB_OK);
+        __debugbreak();
 #endif
         return false;
     }
 
-    // allocate a section for hooking things
-    VirtualAlloc((LPVOID)0x0000000160000000, 0x6000000, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-
-#ifdef DEBUG
-    bool quick_start = true;
-#else
-    bool quick_start = (strstr(GetCommandLine(), "-quickstart") != nullptr);
-#endif
-
     // enable quick start
-    if (quick_start) {
-        // quick start
-        hk::put<bool>(0x142CB8F40, true);
-
-        // IsIntroSequenceComplete always returns true
-        hk::put<uint32_t>(0x140E935B0, 0x90C301B0);
-
-        // IsIntroMovieComplete always returns true
-        hk::put<uint32_t>(0x140E93530, 0x90C301B0);
-    }
+    meow_hook::put(GetAddress(VAR_QUICK_START), true);
+    meow_hook::put(GetAddress(IS_INTRO_SEQUENCE_COMPLETE), 0x90C301B0);
+    meow_hook::put(GetAddress(IS_INTRO_MOVIE_COMPLETE), 0x90C301B0);
 
     // WndProc
-    static hk::inject_jump<LRESULT, HWND, UINT, WPARAM, LPARAM> WndProc(0x140C7FB50);
-    WndProc.inject([](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-        auto game_state   = *(uint32_t *)0x142CB8F24;
-        auto suspend_game = *(bool *)0x142CBDAF0;
-        auto clock        = &jc::Base::CClock::instance();
-
-        if (game_state == 3 && clock) {
-            if (!suspend_game && !clock->m_paused) {
-                if (Input::Get()->WndProc(uMsg, wParam, lParam)) {
-                    return 0;
-                }
-            }
-            // disable input if the game is suspended or the clock is paused.
-            // This fixes issues with window messages not being handled as we stole the message
-            else if (Input::Get()->IsInputEnabled()) {
-                Input::Get()->EnableInput(false);
-            }
-        }
-
-        return WndProc.call(hwnd, uMsg, wParam, lParam);
-    });
+    pfn_WndProc = MH_STATIC_DETOUR(GetAddress(WND_PROC), WndProc);
 
     // Graphics::Flip
-    static hk::inject_jump<void, jc::HDevice_t *> FlipThread(0x140FA2C70);
-    FlipThread.inject([](jc::HDevice_t *device) -> void {
-        Graphics::Get()->BeginDraw(device);
-
-        // draw input
-        Input::Get()->Draw();
-
-        Graphics::Get()->EndDraw();
-
-        FlipThread.call(device);
-    });
+    Graphics::pfn_Flip = MH_STATIC_DETOUR(GetAddress(GRAPHICS_FLIP), Graphics::GraphicsFlipCallback);
 
     // CPlayerManager::Update
-    static hk::inject_jump<void, void *, float> PlayerManagerUpdate(0x140B35860);
-    PlayerManagerUpdate.inject([](void *_this, float dt) {
-        PlayerManagerUpdate.call(_this, dt);
-        jc::SkinChangeRequestHandler::Get()->Update();
-        UpdateVehicleInvulnerability();
-    });
+    pfn_Update = MH_STATIC_DETOUR(GetAddress(PLAYER_MANAGER_UPDATE), PlayerManagerUpdate);
 
-    // override ConsumeAmmo to fix unlimited ammo not being applied to vehicles
-    CFiringModule__ConsumeAmmo_orig = hk::detour_func(0x140728840, CFiringModule__ConsumeAmmo);
-
+    // override CFiringModule::ConsumeAmmo to fix unlimited ammo not being applied to vehicles
+    pfn_ConsumeAmmo = MH_STATIC_DETOUR(GetAddress(FIRING_MODULE_CONSUME_AMMO), FiringModuleConsumeAmmo);
     return true;
 }
 }; // namespace jc

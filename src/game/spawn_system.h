@@ -7,8 +7,6 @@
 #include "game_object.h"
 #include "shared_string.h"
 
-#include "hooking/hooking.h"
-
 #pragma pack(push, 1)
 namespace jc
 {
@@ -25,7 +23,7 @@ class CSpawnSystem
 
     static CSpawnSystem& instance()
     {
-        return **(CSpawnSystem**)0x142CB1D20;
+        return **(CSpawnSystem**)GetAddress(INST_SPAWN_SYSTEM);
     }
 
     void Spawn(const std::string& model_name, const CMatrix4f& transform,
@@ -40,8 +38,8 @@ class CSpawnSystem
         };
 
         auto request = new SpawnReq{callback, userdata};
-        hk::func_call<void>(
-            0x140BADC60, this, model_name.c_str(), transform, 0x597Cu,
+        meow_hook::func_call<void>(
+            GetAddress(SPAWN_SYSTEM_SPAWN), this, model_name.c_str(), transform, 0x597Cu,
             (success_t)[](const spawned_objects& objects, void* userdata) {
                 auto spawn_req = (SpawnReq*)userdata;
                 spawn_req->callback(objects, spawn_req->userdata);
@@ -65,7 +63,8 @@ class CSpawnSystem
         int32_t invalid_tags = 0;
 
         // CSpawnSystem::ParseTags
-        auto count = hk::func_call<int64_t>(0x140B9CA80, this, model_name.c_str(), &tags, &invalid_tags);
+        auto count = meow_hook::func_call<int64_t>(GetAddress(SPAWN_SYSTEM_PARSE_TAGS), this, model_name.c_str(), &tags,
+                                                   &invalid_tags);
         if (!count) {
             // look in the resource defs (to support absolute model paths)
             for (decltype(m_resourceDefCount) i = 0; i < m_resourceDefCount; ++i) {
@@ -79,7 +78,8 @@ class CSpawnSystem
         }
 
         // CSpawnSystem::GetMatchingResources
-        hk::func_call<void>(0x140B88770, this, &tags, out_resources, false, "", 0xDEADBEEF);
+        meow_hook::func_call<void>(GetAddress(SPAWN_SYSTEM_GET_MATCHING_RESOURCES), this, &tags, out_resources, false,
+                                   "", 0xDEADBEEF);
         return !out_resources->empty();
     }
 

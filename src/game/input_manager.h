@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hooking/hooking.h"
+#include <meow_hook/util.h>
 
 #pragma pack(push, 1)
 namespace jc::NInput
@@ -10,17 +10,17 @@ class CManagerBase
   public:
     static CManagerBase& instance()
     {
-        return **(CManagerBase**)0x142CE1AF0;
+        return **(CManagerBase**)GetAddress(INST_INPUT_MANAGER);
     }
 
     void LoseFocus()
     {
-        hk::func_call<void>(0x140FC8560, this);
+        meow_hook::func_call<void>(GetAddress(INPUT_LOST_FOCUS), this);
     }
 
     void GainFocus()
     {
-        hk::func_call<void>(0x140FC84B0, this);
+        meow_hook::func_call<void>(GetAddress(INPUT_GAIN_FOCUS), this);
     }
 };
 }; // namespace jc::NInput

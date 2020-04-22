@@ -4,9 +4,13 @@
 #include "tarray.h"
 #include "vector.h"
 
+#include "addresses.h"
+
 #include <functional>
 #include <memory>
 #include <vector>
+
+#include <meow_hook/util.h>
 
 #pragma pack(push, 1)
 namespace jc
@@ -58,7 +62,7 @@ struct SPartialModelData {
   public:
     SPartialModelData()
     {
-        m_skinTintData = (void*)(*(uintptr_t*)0x142CB1D40 + 0x270);
+        m_skinTintData = (void*)(*(uintptr_t*)GetAddress(INST_CHARACTER_MANAGER) + 0x270);
     }
 
     struct SModelEntry {
@@ -121,7 +125,7 @@ class CCharacter
 
     CGameObject* GetVehiclePtr()
     {
-        return hk::func_call<CGameObject*>(0x14054FD50, this);
+        return meow_hook::func_call<CGameObject*>(GetAddress(CHARACTER_GET_VEHICLE_PTR), this);
     }
 
   public:

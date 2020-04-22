@@ -12,8 +12,10 @@ class WorldCommand : public ICommand
 
     virtual bool Handler(const std::string& arguments) override
     {
-        static auto hnpkWorld = *(void**)0x142CE3F30;
-        static auto WorldTime = *(void**)0x142CAFDB0;
+        using namespace jc;
+
+        static auto hnpkWorld = *(void**)GetAddress(INST_HNPKWORLD);
+        static auto WorldTime = *(void**)GetAddress(INST_WORLDTIME);
 
         static constexpr float DEFAULT_GRAVITY = -9.810f;
 
@@ -22,7 +24,7 @@ class WorldCommand : public ICommand
             float time = 0.0f;
             if (sscanf_s(arguments.c_str(), "time %f", &time) == 1) {
                 time = std::clamp(time, -24.0f, 24.0f);
-                hk::func_call<void>(0x140322720, WorldTime, time, 2);
+                meow_hook::func_call<void>(GetAddress(WORLDTIME_SET_TIME), WorldTime, time, 2);
                 return true;
             }
         }

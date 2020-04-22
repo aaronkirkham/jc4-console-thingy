@@ -1,0 +1,3 @@
+[submodule "deps/meow-hook"]
+	path = deps/meow-hook
+	url = git@github.com:xforce/meow-hook.git

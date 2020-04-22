@@ -9,8 +9,7 @@ workspace "jc4-console-thing"
   cppdialect "c++17"
   characterset "MBCS"
   architecture "x64"
-  disablewarnings { "26451", "26491", "26495", "28020" }
-  defines { "WIN32", "WIN32_LEAN_AND_MEAN", "_CRT_SECURE_NO_WARNINGS", "_CRT_NONSTDC_NO_DEPRECATE" }
+  defines { "WIN32", "WIN32_LEAN_AND_MEAN" }
 
   filter "configurations:Debug"
     defines { "DEBUG", "_DEBUG", "_ITERATOR_DEBUG_LEVEL=0" }
@@ -22,25 +21,89 @@ workspace "jc4-console-thing"
 project "xinput9_1_0"
   kind "SharedLib"
   linkoptions { "/DEF:\"../src/xinput9_1_0.def\"" }
-  dependson { "fw1" }
-  links { "out/%{cfg.buildcfg}/fw1" }
+  links { "fw1", "meow-hook" }
+  defines { "NOMINMAX" }
+
   files {
     "src/**.h",
     "src/**.cpp",
     "src/xinput9_1_0.def",
-    "deps/libudis86/*.c",
-    "deps/libudis86/*.h",
   }
+
+  removefiles "src/generator/**"
 
   includedirs {
     "src",
-    "deps/libudis86",
-    "deps/fw1"
+    "deps/fw1",
+    "deps/meow-hook/include"
   }
 
-  defines { "NOMINMAX" }
-  disablewarnings { "4005", "4244", "4267", "4996", "6031", "6262" }
+  postbuildcommands {
+    "copy /Y \"$(TargetDir)$(ProjectName).dll\" \"D:/Steam/steamapps/common/Just Cause 4/$(ProjectName).dll\"",
+    "Exit 0"
+  }
 
-project "fw1"
-  kind "StaticLib"
-  files { "deps/fw1/*.h", "deps/fw1/*.cpp" }
+project "address-generator"
+  kind "ConsoleApp"
+  links "meow-hook"
+  files "src/generator/**"
+  includedirs "deps/meow-hook/include"
+
+group "deps"
+  project "fw1"
+    kind "StaticLib"
+    files { "deps/fw1/*.h", "deps/fw1/*.cpp" }
+
+  project "asmjit"
+    kind "StaticLib"
+    defines "ASMJIT_STATIC"
+    files "deps/meow-hook/third_party/asmjit/src/**"
+    includedirs "deps/meow-hook/third_party/asmjit/src"
+
+  project "zydis"
+    kind "StaticLib"
+    defines {
+      "ZYCORE_STATIC_DEFINE",
+      "ZYDIS_STATIC_DEFINE"
+    }
+
+    includedirs {
+      "deps/meow-hook/third_party/zydis/src",
+      "deps/meow-hook/third_party/zydis/include",
+      "deps/meow-hook/third_party/zydis/msvc",
+      "deps/meow-hook/third_party/zydis/dependencies/zycore/include"
+    }
+
+    files {
+      "deps/meow-hook/third_party/zydis/dependencies/zycore/src/**",
+      "deps/meow-hook/third_party/zydis/dependencies/zycore/include/**",
+      "deps/meow-hook/third_party/zydis/src/**",
+      "deps/meow-hook/third_party/zydis/include/Zydis/**",
+    }
+
+  project "meow-hook"
+    kind "StaticLib"
+
+    links { "asmjit", "zydis" }
+
+    defines {
+      "NOMINMAX",
+      "ASMJIT_STATIC",
+      "ZYCORE_STATIC_DEFINE",
+      "ZYDIS_STATIC_DEFINE"
+    }
+
+    includedirs {
+      "deps/meow-hook/include",
+      "deps/meow-hook/third_party/asmjit/src",
+      "deps/meow-hook/third_party/zydis/src",
+      "deps/meow-hook/third_party/zydis/include",
+      "deps/meow-hook/third_party/zydis/msvc",
+      "deps/meow-hook/third_party/zydis/dependencies/zycore/include"
+    }
+
+    files {
+      "deps/meow-hook/src/*.cc",
+      "deps/meow-hook/src/*.h",
+      "deps/meow-hook/include/meow_hook/*.h",
+    }

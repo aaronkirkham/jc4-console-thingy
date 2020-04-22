@@ -7,17 +7,54 @@
 #include "entity_provider.h"
 #include "player_manager.h"
 
+#include <meow_hook/detour.h>
+
 #include <algorithm>
 #include <array>
+#include <assert.h>
 
 namespace jc
 {
+
+void                              DrawSkinBatches(jc::CModelRenderBlock *, void *, void *, bool);
+static decltype(DrawSkinBatches) *pfn_DrawSkinBatches = nullptr;
+
+void DrawSkinBatches(jc::CModelRenderBlock *render_block, void *render_context, void *rbi_info, bool unknown)
+{
+    int16_t *original_skeleton_lookup = nullptr;
+
+    {
+        std::lock_guard<std::mutex> lk{jc::SkeletonLookup::Get()->m_mutex};
+
+        const auto skeleton_lookup = &jc::SkeletonLookup::Get()->m_lookup;
+        const auto find_it         = skeleton_lookup->find(rbi_info);
+
+        // set the custom skeleton lookup before render
+        if (find_it != skeleton_lookup->end()) {
+            const auto &lookup = (*find_it);
+            const auto  it     = lookup.second.find(render_block);
+
+            if (it != lookup.second.end() && (*it).second != nullptr) {
+                original_skeleton_lookup               = render_block->m_mesh->m_skeletonLookup;
+                render_block->m_mesh->m_skeletonLookup = (*it).second;
+            }
+        }
+    }
+
+    pfn_DrawSkinBatches(render_block, render_context, rbi_info, unknown);
+
+    // restore the original skeleton lookup after render
+    if (original_skeleton_lookup) {
+        render_block->m_mesh->m_skeletonLookup = original_skeleton_lookup;
+    }
+}
+
 SkinChangeRequestHandler::SkinChangeRequestHandler()
 {
     static std::once_flag _once;
     std::call_once(_once, [&] {
         m_provider = (CEntityProvider *)jc::_alloc(sizeof(CEntityProvider));
-        hk::func_call<void>(0x14025F860, m_provider); // CEntityProvider::CEntityProvider
+        meow_hook::func_call<void>(GetAddress(ENTITY_PROVIDER_CTOR), m_provider); // CEntityProvider::CEntityProvider
 
         // setup
         m_provider->m_resourceCache    = CSpawnSystem::instance().m_resourceCache;
@@ -28,36 +65,7 @@ SkinChangeRequestHandler::SkinChangeRequestHandler()
         // cause visual artifacts with random peds. Because the rbi_info struct is unique to each CModelInstance, we can
         // switch the skeleton lookup before the skin batches are drawn, and switch back to the original after to
         // prevent this from happening. magic.
-        static hk::inject_jump<void, jc::CModelRenderBlock *, void *, void *, bool> DrawSkinBatches(0x140D1A150);
-        DrawSkinBatches.inject(
-            [](jc::CModelRenderBlock *render_block, void *render_context, void *rbi_info, bool unknown) {
-                int16_t *original_skeleton_lookup = nullptr;
-
-                {
-                    std::lock_guard<std::mutex> lk{jc::SkeletonLookup::Get()->m_mutex};
-
-                    const auto skeleton_lookup = &jc::SkeletonLookup::Get()->m_lookup;
-                    const auto find_it         = skeleton_lookup->find(rbi_info);
-
-                    // set the custom skeleton lookup before render
-                    if (find_it != skeleton_lookup->end()) {
-                        const auto &lookup = (*find_it);
-                        const auto  it     = lookup.second.find(render_block);
-
-                        if (it != lookup.second.end() && (*it).second != nullptr) {
-                            original_skeleton_lookup               = render_block->m_mesh->m_skeletonLookup;
-                            render_block->m_mesh->m_skeletonLookup = (*it).second;
-                        }
-                    }
-                }
-
-                DrawSkinBatches.call(render_block, render_context, rbi_info, unknown);
-
-                // restore the original skeleton lookup after render
-                if (original_skeleton_lookup) {
-                    render_block->m_mesh->m_skeletonLookup = original_skeleton_lookup;
-                }
-            });
+        pfn_DrawSkinBatches = MH_STATIC_DETOUR(GetAddress(DRAW_SKIN_BATCHES), DrawSkinBatches);
     });
 }
 
@@ -70,7 +78,7 @@ void SkinChangeRequestHandler::Request(CSharedString &resource_path, std::functi
     m_callback = fn;
 
     // CEntityProvider::LoadResources
-    hk::func_call<void>(0x140284870, m_provider, &resource_path);
+    meow_hook::func_call<void>(GetAddress(ENTITY_PROVIDER_LOAD_RESOURCES), m_provider, &resource_path);
 }
 
 void SkinChangeRequestHandler::Update()
@@ -270,8 +278,8 @@ void SkinChangeRequestHandler::Update()
 #endif
 
     // CEntityProvider::UpdateInternal
-    hk::func_call<void>(
-        0x140294F20, m_provider, this,
+    meow_hook::func_call<void>(
+        GetAddress(ENTITY_PROVIDER_UPDATE_INTERNAL), m_provider, this,
         (entity_provider_callback_t)[](void *puser) {
             auto request_handler = (SkinChangeRequestHandler *)puser;
             assert(request_handler->m_provider->m_entityResourceLoader);

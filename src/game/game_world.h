@@ -2,6 +2,8 @@
 
 #include "vector.h"
 
+#include "addresses.h"
+
 #pragma pack(push, 1)
 namespace jc
 {
@@ -10,7 +12,7 @@ class CGameWorld
   public:
     static CGameWorld &instance()
     {
-        return **(CGameWorld **)0x142CB0A48;
+        return **(CGameWorld **)GetAddress(INST_GAME_WORLD);
     }
 
   public:

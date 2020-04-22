@@ -8,7 +8,7 @@ class CClock
   public:
     static CClock& instance()
     {
-        return **(CClock**)0x142C846B0;
+        return **(CClock**)GetAddress(INST_CLOCK);
     }
 
   public:

@@ -1,11 +1,14 @@
 #include "character.h"
 
+#include "addresses.h"
 #include "entity_provider.h"
 #include "player_manager.h"
 #include "skin_change_req_handler.h"
 #include "spawn_system.h"
 
 #include "hashlittle.h"
+
+#include <meow_hook/util.h>
 
 namespace jc
 {
@@ -57,8 +60,9 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
 
                     // copy old model info
                     static CMatrix4f identity{};
-                    hk::func_call<void>(0x147BC1B50, &skin_swapper->m_oldModelState, model_state, &identity,
-                                        &character->m_animatedModel.m_animationController->m_skinningPalette);
+                    meow_hook::func_call<void>(GetAddress(CHARACTER_MODEL_COPY_PARTS), &skin_swapper->m_oldModelState,
+                                               model_state, &identity,
+                                               &character->m_animatedModel.m_animationController->m_skinningPalette);
                 }
 
                 // @NOTE: can be anything just not the default skin hash.
@@ -67,11 +71,12 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
             }
 
             // parse runtime container to get model data
-            hk::func_call<void>(0x14028C790, &model_data, &rc);
+            meow_hook::func_call<void>(GetAddress(CHARACTER_MODEL_SET_PROPERTIES), &model_data, &rc);
 
             // rebuild model parts
-            hk::func_call<void>(0x147BFFE90, model_state, &model_data, &character->m_worldTransform,
-                                &character->m_animatedModel.m_animationController->m_skinningPalette);
+            meow_hook::func_call<void>(GetAddress(CHARACTER_MODEL_REBUILD_MODEL), model_state, &model_data,
+                                       &character->m_worldTransform,
+                                       &character->m_animatedModel.m_animationController->m_skinningPalette);
 
             break;
         }
@@ -96,8 +101,9 @@ static void ChangeSkinImpl(CCharacter* character, const CRuntimeContainer* conta
                 CModelRenderBlock* render_block = render_blocks[x];
                 uint64_t           vtable       = *(uint64_t*)render_block;
 
-                // RenderBlockCharacter & RenderBlockCharacterSkin & RenderBlockGeneral
-                if (vtable == 0x141eac550 || vtable == 0x141eac3a0 || vtable == 0x141ebdf50) {
+                if (vtable == GetAddress(VTABLE_RENDERBLOCKCHARACTER)
+                    || vtable == GetAddress(VTABLE_RENDERBLOCKCHARACTERSKIN)
+                    || vtable == GetAddress(VTABLE_RENDERBLOCKGENERAL)) {
                     SkeletonLookup::Get()->Make(&instance->m_rbiInfo, render_block);
                 } else {
 #ifdef _DEBUG

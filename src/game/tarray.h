@@ -1,7 +1,5 @@
 #pragma once
 
-#include "hooking/hooking.h"
-
 namespace jc
 {
 template <typename T> class TArray
@@ -17,13 +15,13 @@ template <typename T> class TArray
         m_begin     = nullptr;
         m_end       = nullptr;
         m_last      = nullptr;
-        m_allocator = hk::func_call<void*>(0x140F236F0);
+        m_allocator = meow_hook::func_call<void*>(GetAddress(GET_DEFAULT_PLATFORM_ALLOCATOR));
     }
 
     ~TArray()
     {
         if (m_allocator && m_begin) {
-            hk::func_call<void>(0x140838070, m_allocator, m_begin, sizeof(T));
+            meow_hook::func_call<void>(GetAddress(PLATFORM_ALLOCATOR_FREE), m_allocator, m_begin, sizeof(T));
         }
     }
 };
