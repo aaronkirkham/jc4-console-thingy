@@ -10,6 +10,7 @@ workspace "jc4-console-thing"
   characterset "MBCS"
   architecture "x64"
   defines { "WIN32", "WIN32_LEAN_AND_MEAN" }
+  startproject "xinput9_1_0"
 
   filter "configurations:Debug"
     defines { "DEBUG", "_DEBUG", "_ITERATOR_DEBUG_LEVEL=0" }

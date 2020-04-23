@@ -4,10 +4,10 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
 <p align="center"><img src="https://i.imgur.com/pDelm9v.png" alt=""></p>
 
 ### How to Install
- - Download the latest version from [releases](https://github.com/aaronkirkham/jc4-console-thingy/releases)
+ - Download the latest version from [releases](https://github.com/aaronkirkham/jc4-console-thingy/releases/latest)
  - Extract `xinput9_1_0.dll` to your Just Cause 4 installation folder
  - Start the game and press the tilde (\`~) or F1 key to open the console
- - ***OPTIONAL*** - Enable super fast game loading with the `-quickstart` launch argument via Steam
+ - ***OPTIONAL*** - Enable super fast game loading with the `-quickstart` launch argument
 
 ### Commands
  - `spawn` - Spawn everything! Vehicles, characters, animals & props.
@@ -33,5 +33,6 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
 #### Building
 If you want to compile the code yourself, you will need **Visual Studio 2017 or later** (or a compiler which supports C++17 nested namespaces)
  - Clone this repository
+ - Init dependencies `git submodule update --init --recursive`
  - Run `configure.ps1` with PowerShell
  - Build `out/jc4-console-thing.sln` in Visual Studio
