@@ -366,6 +366,9 @@ class SpawnCommand : public ICommand
             // DLC Shark & Bark pack
             "v082_car_shark_garage",
             "v083_car_dog_garage",
+            
+            // DLC Brawler Mech
+            "v600_mech_loader_garage",
 
             // DLC Daredevils
             "v072_car_vintagesuvdlc1_debug",
