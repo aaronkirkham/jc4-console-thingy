@@ -14,6 +14,7 @@
 
 namespace jc
 {
+#pragma pack(push, 1)
 struct CFiringModule {
     char _pad[0x310];
     struct {
@@ -23,6 +24,9 @@ struct CFiringModule {
     char     _pad2[0x24C];
     uint32_t m_ammoType; // 564
 };
+#pragma pack(pop)
+
+static_assert(sizeof(CFiringModule) == 0x568);
 
 LRESULT WndProc(HWND, UINT, WPARAM, LPARAM);
 void    FiringModuleConsumeAmmo(CFiringModule *, uintptr_t, int64_t);
