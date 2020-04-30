@@ -371,6 +371,16 @@ class SpawnCommand : public ICommand
             "v600_mech_loader_garage",
 
             // DLC Daredevils
+            "v070_car_offroadtruckdlc1_level_0",
+            "v070_car_offroadtruckdlc1_level_1",
+            "v070_car_offroadtruckdlc1_level_2",
+            "v070_car_offroadtruckdlc1_level_3",
+            
+            "v071_car_modernpickupdlc1_level_0",
+            "v071_car_modernpickupdlc1_level_1",
+            "v071_car_modernpickupdlc1_level_2",
+            "v071_car_modernpickupdlc1_level_3",
+            
             "v072_car_vintagesuvdlc1_debug",
             "v072_car_vintagesuvdlc1_level_0",
             "v072_car_vintagesuvdlc1_level_1",
@@ -441,6 +451,8 @@ class SpawnCommand : public ICommand
             "v051_car_battlemuscle_survivalraceace_level_1",
             "v051_car_battlemuscle_survivalraceace_level_2",
             "v051_car_battlemuscle_survivalraceace_level_3",
+            
+            "daredevil",
 
             // DLC Demons
             "wpn_102_crossbow",
