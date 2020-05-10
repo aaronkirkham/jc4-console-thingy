@@ -134,10 +134,18 @@ bool InitPatchesAndHooks()
         return false;
     }
 
+#ifdef DEBUG
+    bool quick_start = true;
+#else
+    bool quick_start = (strstr(GetCommandLine(), "-quickstart") != nullptr);
+#endif
+
     // enable quick start
-    meow_hook::put(GetAddress(VAR_QUICK_START), true);
-    meow_hook::put(GetAddress(IS_INTRO_SEQUENCE_COMPLETE), 0x90C301B0);
-    meow_hook::put(GetAddress(IS_INTRO_MOVIE_COMPLETE), 0x90C301B0);
+    if (quick_start) {
+        meow_hook::put(GetAddress(VAR_QUICK_START), true);
+        meow_hook::put(GetAddress(IS_INTRO_SEQUENCE_COMPLETE), 0x90C301B0);
+        meow_hook::put(GetAddress(IS_INTRO_MOVIE_COMPLETE), 0x90C301B0);
+    }
 
     // WndProc
     pfn_WndProc = MH_STATIC_DETOUR(GetAddress(WND_PROC), WndProc);
