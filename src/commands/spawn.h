@@ -42,17 +42,18 @@ class SpawnCommand : public ICommand
                 spacer = std::stoi(arguments.substr(spacer_position + 1, std::string::npos));
             }
 
+            int square_root            = (int) (std::sqrt((double) multiplier) + 0.5f);
             // do the actual spawning
             for (int i = 0; i < multiplier; i++) {
-                jc::CSpawnSystem::instance().Spawn(truncated_args, transform,
-                                                   [](const jc::spawned_objects &objects, void *) {});
-                // the pattern to spawn things in
-                if ((i%10 == 0) && (i != 0)) {
+                // spawn things in as square a rectangle as possible
+                if ((i% square_root == 0) && (i != 0)) {
                     transform.m[3].x = transform.m[3].x + spacer;
-                    transform.m[3].z = transform.m[3].z - (10 * spacer);
+                    transform.m[3].z = transform.m[3].z - (square_root * spacer);
                 } else {
                     transform.m[3].z = transform.m[3].z + spacer;
                 }
+                jc::CSpawnSystem::instance().Spawn(truncated_args, transform,
+                                                   [](const jc::spawned_objects &objects, void *) {});
             }
             
         } else {
