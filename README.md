@@ -11,6 +11,7 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
 
 ### Commands
  - `spawn` - Spawn everything! Vehicles, characters, animals & props.
+ 	- `spawn <thing> *<how many> /<how far apart> `- Spawn as many things as you want! (The game does limit how many of a thing can be in the world at once)
  - `event` - Trigger game events - **CAUTION** - Stick to using only the hints, unless you know what the event does
  - `world` - Change world parameters
  - `skin` - Change player skin

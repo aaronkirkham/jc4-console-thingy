@@ -17,6 +17,7 @@ class SpawnCommand : public ICommand
             return false;
         }
 
+
         auto  local_player = jc::CPlayerManager::instance().m_localPlayer;
         auto  transform    = local_player->m_character->m_worldTransform;
         auto &aimpos       = local_player->m_aimControl->m_aimPos;
@@ -25,8 +26,42 @@ class SpawnCommand : public ICommand
         transform.m[3].y = aimpos.y + 1.0f;
         transform.m[3].z = aimpos.z;
 
-        // NOTE(aaronlad): spawn flag 0x8000 will prevent auto despawn
-        jc::CSpawnSystem::instance().Spawn(arguments, transform, [](const jc::spawned_objects &objects, void *) {});
+        // figure out if the player wants to spawn more than one thing
+        if (arguments.find("*", 0) != std::string::npos) {
+            // identify the multiplier and turn it into something we can use, then create a string without it
+            // also identify the spacer to enable spawning of bigger things
+            // limiting the size of the substring limits max spawned entities, although the game seems to limit this itself
+            size_t multiplier_position = arguments.find("*", 0);
+            size_t spacer_position     = arguments.find("/", 0);
+            std::string truncated_args = arguments.substr(0, multiplier_position - 1);
+
+            int multiplier             = std::stoi(arguments.substr(multiplier_position + 1, 4)); 
+            int spacer                 = 5;
+
+            if (spacer_position != std::string::npos) {
+                spacer = std::stoi(arguments.substr(spacer_position + 1, std::string::npos));
+            }
+
+            int square_root            = (int) (std::sqrt((double) multiplier) + 0.5f);
+            // do the actual spawning
+            for (int i = 0; i < multiplier; i++) {
+                // spawn things in as square a rectangle as possible
+                if ((i% square_root == 0) && (i != 0)) {
+                    transform.m[3].x = transform.m[3].x + spacer;
+                    transform.m[3].z = transform.m[3].z - (square_root * spacer);
+                } else {
+                    transform.m[3].z = transform.m[3].z + spacer;
+                }
+                jc::CSpawnSystem::instance().Spawn(truncated_args, transform,
+                                                   [](const jc::spawned_objects &objects, void *) {});
+            }
+            
+        } else {
+
+            // NOTE(aaronlad): spawn flag 0x8000 will prevent auto despawn
+            jc::CSpawnSystem::instance().Spawn(arguments, transform, [](const jc::spawned_objects &objects, void *) {});
+        }
+
         return true;
     }
 
