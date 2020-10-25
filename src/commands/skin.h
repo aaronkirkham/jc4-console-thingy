@@ -10,15 +10,15 @@ class SkinCommand : public ICommand
         return "skin";
     }
 
-    virtual bool Handler(const std::string& arguments) override
+    virtual std::pair<bool, std::string> Handler(const std::string& arguments) override
     {
         std::vector<jc::CSpawnSystem::SResourceDef*, jc::allocator<jc::CSpawnSystem::SResourceDef*>> resources;
         if (jc::CSpawnSystem::instance().GetMatchingResources(arguments, &resources)) {
             jc::CPlayerManager::instance().GetLocalPlayerCharacter()->ChangeSkin(resources[0]->m_resourcePath);
-            return true;
+            return {true, ""};
         }
 
-        return false;
+        return {false, ""};
     }
 
     virtual std::vector<std::string> GetHints(const std::string& arguments) override

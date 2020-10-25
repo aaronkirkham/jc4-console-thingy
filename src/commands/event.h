@@ -10,16 +10,16 @@ class EventCommand : public ICommand
         return "event";
     }
 
-    virtual bool Handler(const std::string& arguments) override
+    virtual std::pair<bool, std::string> Handler(const std::string& arguments) override
     {
         using namespace jc;
 
         if (arguments == "load_game" || arguments == "new_game" || arguments == "continue_game") {
-            return false;
+            return {false, ""};
         }
 
         meow_hook::func_call<void>(GetAddress(SEND_EVENT), arguments.c_str(), nullptr);
-        return true;
+        return {true, ""};
     }
 
     virtual std::vector<std::string> GetHints(const std::string& arguments) override
