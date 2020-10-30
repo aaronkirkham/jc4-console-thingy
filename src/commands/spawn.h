@@ -10,11 +10,11 @@ class SpawnCommand : public ICommand
         return "spawn";
     }
 
-    virtual bool Handler(const std::string &arguments) override
+    virtual std::pair<bool, std::string> Handler(const std::string &arguments) override
     {
         if (arguments == "rico_debug" || arguments == "rico_preview_debug" || arguments == "rico_cow_skin"
             || arguments == "rico_cow_skin_debug") {
-            return false;
+            return {false, ""};
         }
 
         auto  local_player = jc::CPlayerManager::instance().m_localPlayer;
@@ -27,7 +27,7 @@ class SpawnCommand : public ICommand
 
         // NOTE(aaronlad): spawn flag 0x8000 will prevent auto despawn
         jc::CSpawnSystem::instance().Spawn(arguments, transform, [](const jc::spawned_objects &objects, void *) {});
-        return true;
+        return {true, ""};
     }
 
     virtual std::vector<std::string> GetHints(const std::string &arguments) override

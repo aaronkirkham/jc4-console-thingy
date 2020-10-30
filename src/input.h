@@ -23,6 +23,7 @@ class Input : public Singleton<Input>
     std::string              m_cmdText        = "";
     std::string              m_cmdArguments   = "";
     std::vector<std::string> m_hints;
+    std::string              m_commandOutput  = "";
     int32_t                  m_selectedHint   = -1;
     int32_t                  m_hintPage       = 0;
     bool                     m_controlPressed = false;

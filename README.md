@@ -19,6 +19,8 @@ Spawn anything and everything, vehicles, characters, animals, props. Enable infi
    - `tp save <name>` - Save current coordinates as named location
    - `tp <name>` - Go to saved named location
    - `tp delete <name>` - Delete saved named location
+   - `tp get <name>` - Prints position of named location
+   - `tp printpos` - Prints current player position
 
 ### Controls
  - `Tilde` (\`~) or `F1` - Toggle the input box

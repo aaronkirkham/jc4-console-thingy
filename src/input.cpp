@@ -36,6 +36,11 @@ void Input::EnableInput(bool toggle)
         hud_bottom_left->m_state = toggle ? 1 : 2;
     }
 
+	// clear last command onput if re-toggling
+    if (toggle) {
+        m_commandOutput = "";
+	}
+
     if (toggle) {
         // resets keys so we don't have keys stuck after giving input back
         jc::NInput::CManagerBase::instance().LoseFocus();
@@ -50,17 +55,22 @@ void Input::Draw()
     auto debug_renderer = jc::CRenderEngine::instance().m_debugRenderer;
 
     if (m_drawInput && debug_renderer) {
+
+		const bool bDrawCommandOutput = (m_commandOutput != "");
+		
         // draw hints
         if (m_cmd && m_hints.size() > 0) {
             const auto  count = std::clamp<uint32_t>(((uint32_t)m_hints.size() - m_hintPage), 0, NUM_HINTS_PER_PAGE);
             const float total_height = (HINT_ITEM_HEIGHT * count);
-
-            debug_renderer->DebugRectGradient({0, (0.94f - total_height - 0.02f)}, {0.5f, 0.94f}, 0xB4000000,
+            const float output_offset = (float)bDrawCommandOutput * HINT_ITEM_HEIGHT;
+            debug_renderer->DebugRectGradient({0, (0.94f - total_height - 0.02f - output_offset)},
+                                              {0.5f, 0.94f - output_offset*2},
+                                              0xB4000000,
                                               0x00000000);
 
             for (uint32_t i = 0; i < count; ++i) {
                 // draw current hint
-                const float y = (0.9325f - total_height + (HINT_ITEM_HEIGHT * i));
+                const float y = (0.9325f - total_height + (HINT_ITEM_HEIGHT * i) - output_offset);
                 Graphics::Get()->DrawString(m_hints[i + m_hintPage], 0.0195f, y, FONT_SIZE_HINT, 0xFFFFFFFF);
 
                 if ((i + m_hintPage) == m_selectedHint) {
@@ -68,6 +78,15 @@ void Input::Draw()
                 }
             }
         }
+
+		// draw last command output
+        if (bDrawCommandOutput) {
+
+			debug_renderer->DebugRectGradient({0, (0.94f - HINT_ITEM_HEIGHT - 0.02f)}, {0.5f, 0.94f}, 0xB4000000, 0x00000000);
+
+            const float y = (0.9325f - HINT_ITEM_HEIGHT);
+            Graphics::Get()->DrawString(m_commandOutput, 0.0195f, y, FONT_SIZE_HINT, 0xFF808080); // Grey colour
+		}
 
         // draw current input text
         debug_renderer->DebugRectGradient({0, 0.95f}, {0.5f, 1}, 0xE1000000, 0x00000000);
@@ -230,12 +249,20 @@ bool Input::FeedEvent(uint32_t message, WPARAM wParam, LPARAM lParam)
                         }
 
                         const auto input_text = m_history[0];
+                        bool       bDidCommandReturnOutput = false;
                         m_history[0]          = "";
                         m_currentHistory      = 0;
 
                         if (m_cmd) {
-                            if (m_cmd->Handler(m_cmdArguments)) {
+                            auto commandResult = m_cmd->Handler(m_cmdArguments);
+                            auto commandSuccess = commandResult.first;
+                            auto commandOutput = commandResult.second;
+                            if (commandSuccess) { // If successful
                                 AddToHistory(input_text);
+								if (commandOutput != "") {
+                                    m_commandOutput = commandOutput;
+                                    bDidCommandReturnOutput = true;
+								}
                             }
                         } else if (m_fnCommands.size() > 0) {
                             const auto it = m_fnCommands.find(m_cmdText);
@@ -244,11 +271,13 @@ bool Input::FeedEvent(uint32_t message, WPARAM wParam, LPARAM lParam)
                                 AddToHistory(input_text);
                             }
                         }
-
+						
                         m_cmd = nullptr;
                         m_cmdText.clear();
                         m_cmdArguments.clear();
-                        EnableInput(false);
+                        if (!bDidCommandReturnOutput) {
+							EnableInput(false);
+						}
                         break;
                     }
 
