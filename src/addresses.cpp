@@ -6,7 +6,7 @@ static uintptr_t g_Address[Address::COUNT] = {};
 
 void InitAddresses(bool is_steam)
 {
-    g_Address[SANITY_CHECK] = is_steam ? 0x141e7ee40 : 0x141e84ae8;
+    g_Address[SANITY_CHECK] = is_steam ? 0x141e7ee40 : 0x141e84af8;
     g_Address[INST_CLOCK] = is_steam ? 0x142c846b0 : 0x142c8aaa8;
     g_Address[INST_CHARACTER_MANAGER] = is_steam ? 0x142cb1d40 : 0x142cb8110;
     g_Address[INST_GAME_WORLD] = is_steam ? 0x142cb0a48 : 0x142cb6e08;
@@ -18,37 +18,37 @@ void InitAddresses(bool is_steam)
     g_Address[INST_HNPKWORLD] = is_steam ? 0x142ce3f30 : 0x142cea370;
     g_Address[INST_WORLDTIME] = is_steam ? 0x142cafdb0 : 0x142cb6170;
     g_Address[VAR_QUICK_START] = is_steam ? 0x142cb8f40 : 0x142cbf304;
-    g_Address[IS_INTRO_SEQUENCE_COMPLETE] = is_steam ? 0x140e935b0 : 0x140e9b0d0;
-    g_Address[IS_INTRO_MOVIE_COMPLETE] = is_steam ? 0x140e93530 : 0x140e9b050;
-    g_Address[WND_PROC] = is_steam ? 0x140c7fb50 : 0x140c86fb0;
-    g_Address[GRAPHICS_FLIP] = is_steam ? 0x140fa2c70 : 0x140faa750;
-    g_Address[PLAYER_MANAGER_UPDATE] = is_steam ? 0x1498aa770 : 0x14e501500;
+    g_Address[IS_INTRO_SEQUENCE_COMPLETE] = is_steam ? 0x140e935b0 : 0x140e9b140;
+    g_Address[IS_INTRO_MOVIE_COMPLETE] = is_steam ? 0x140e93530 : 0x140e9b0c0;
+    g_Address[WND_PROC] = is_steam ? 0x140c7fb50 : 0x140c87020;
+    g_Address[GRAPHICS_FLIP] = is_steam ? 0x140fa2c70 : 0x140faa7c0;
+    g_Address[PLAYER_MANAGER_UPDATE] = is_steam ? 0x1498aa770 : 0x155dff420;
     g_Address[FIRING_MODULE_CONSUME_AMMO] = is_steam ? 0x140728840 : 0x14072c510;
     g_Address[VAR_GAME_STATE] = is_steam ? 0x142cb8f24 : 0x142cbf2d4;
     g_Address[VAR_SUSPEND_GAME] = is_steam ? 0x142cbdaf0 : 0x142cc3f90;
-    g_Address[ALLOC] = is_steam ? 0x140a51dc0 : 0x140a57510;
-    g_Address[FREE] = is_steam ? 0x141af8e1c : 0x141b012dc;
-    g_Address[GET_DEFAULT_PLATFORM_ALLOCATOR] = is_steam ? 0x140f236f0 : 0x140f2b380;
+    g_Address[ALLOC] = is_steam ? 0x140a51dc0 : 0x140a57580;
+    g_Address[FREE] = is_steam ? 0x141af8e1c : 0x141b0134c;
+    g_Address[GET_DEFAULT_PLATFORM_ALLOCATOR] = is_steam ? 0x140f236f0 : 0x140f2b3f0;
     g_Address[PLATFORM_ALLOCATOR_FREE] = is_steam ? 0x140838070 : 0x14083c9b0;
     g_Address[CHARACTER_MODEL_COPY_PARTS] = is_steam ? 0x14026e9b0 : 0x14026f7f0;
     g_Address[CHARACTER_MODEL_SET_PROPERTIES] = is_steam ? 0x14028c790 : 0x14028d4e0;
     g_Address[CHARACTER_MODEL_REBUILD_MODEL] = is_steam ? 0x140287840 : 0x140288590;
     g_Address[CHARACTER_GET_VEHICLE_PTR] = is_steam ? 0x14054fd50 : 0x140551a10;
     g_Address[SEND_EVENT] = is_steam ? 0x140286930 : 0x140287680;
-    g_Address[SPAWN_SYSTEM_SPAWN] = is_steam ? 0x140badc60 : 0x140bb4a10;
-    g_Address[SPAWN_SYSTEM_PARSE_TAGS] = is_steam ? 0x1499d0740 : 0x14e607061;
-    g_Address[SPAWN_SYSTEM_GET_MATCHING_RESOURCES] = is_steam ? 0x140b88770 : 0x140b8ef20;
+    g_Address[SPAWN_SYSTEM_SPAWN] = is_steam ? 0x140badc60 : 0x140bb4a80;
+    g_Address[SPAWN_SYSTEM_PARSE_TAGS] = is_steam ? 0x1499d0740 : 0x155f27001;
+    g_Address[SPAWN_SYSTEM_GET_MATCHING_RESOURCES] = is_steam ? 0x140b88770 : 0x140b8ef90;
     g_Address[WORLDTIME_SET_TIME] = is_steam ? 0x140322720 : 0x140324070;
-    g_Address[INPUT_LOST_FOCUS] = is_steam ? 0x140fc8560 : 0x140fce5e0;
-    g_Address[INPUT_GAIN_FOCUS] = is_steam ? 0x140fc84b0 : 0x140fce530;
+    g_Address[INPUT_LOST_FOCUS] = is_steam ? 0x140fc8560 : 0x140fce650;
+    g_Address[INPUT_GAIN_FOCUS] = is_steam ? 0x140fc84b0 : 0x140fce5a0;
     g_Address[ENTITY_PROVIDER_CTOR] = is_steam ? 0x14025f860 : 0x140260710;
     g_Address[ENTITY_PROVIDER_LOAD_RESOURCES] = is_steam ? 0x140284870 : 0x140285590;
     g_Address[ENTITY_PROVIDER_UPDATE_INTERNAL] = is_steam ? 0x140294f20 : 0x140295cd0;
-    g_Address[DRAW_SKIN_BATCHES] = is_steam ? 0x140d1a150 : 0x140d21810;
+    g_Address[DRAW_SKIN_BATCHES] = is_steam ? 0x140d1a150 : 0x140d21880;
     g_Address[RUNTIME_CONTAINER_GET_HASH] = is_steam ? 0x140091360 : 0x140090f60;
-    g_Address[VTABLE_RENDERBLOCKCHARACTER] = is_steam ? 0x141eac3a0 : 0x141eb2050;
-    g_Address[VTABLE_RENDERBLOCKCHARACTERSKIN] = is_steam ? 0x141eac550 : 0x141eb2200;
-    g_Address[VTABLE_RENDERBLOCKGENERAL] = is_steam ? 0x141ebdf50 : 0x141ec3c10;
+    g_Address[VTABLE_RENDERBLOCKCHARACTER] = is_steam ? 0x141eac3a0 : 0x141eb2060;
+    g_Address[VTABLE_RENDERBLOCKCHARACTERSKIN] = is_steam ? 0x141eac550 : 0x141eb2210;
+    g_Address[VTABLE_RENDERBLOCKGENERAL] = is_steam ? 0x141ebdf50 : 0x141ec3c20;
 }
 
 uintptr_t GetAddress(Address address)
