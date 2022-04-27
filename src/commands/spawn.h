@@ -338,6 +338,9 @@ class SpawnCommand : public ICommand
 
             // DLC Neon racer
             "v024_car_ecosuper_preorder_01",
+            
+            // DLC The Dragon
+            "wpn_904_dragon",
 
             // DLC Toy Vehicle pack
             "v122_boat_toypatrol_garage",
